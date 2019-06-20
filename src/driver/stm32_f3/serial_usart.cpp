@@ -81,7 +81,7 @@ buffer<uint8_t> serial_usart::read() {
 }
 
 bool serial_usart::write(uint8_t val) {
-
+  return false;
 }
 
 }

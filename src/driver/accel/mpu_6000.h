@@ -14,10 +14,9 @@ public:
   float read_temparture();
   buffer<float> read_gyro();
   buffer<int16_t> read_accel();
-  float gyro_bias[3];
 
 private:
   spi* bus;
   gpio::pin* cs;
-
+  float gyro_bias[3];
 };

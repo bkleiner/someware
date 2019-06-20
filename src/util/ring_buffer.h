@@ -46,27 +46,14 @@ public:
 
     *t = _buf[_front];
     
-    _front = (_front + 1) % int32_t(_buf.size() - 1);
+    _front = (_front + 1) % int32_t(_buf.size());
     _count--;
     return true;
   }
-/*
-  bool consume(int32_t max_size) {
-    if (empty()) {
-      return false;
-    }
-    
-    const auto count = util::min(max_size, _count);
-    for (int32_t i = 0; i < count; i++) {
-      _front = (_front + 1) % int32_t(_buf.size() - 1);
-      _count--;
-    }
-    return true;
-  }
-*/
+
 private:
   buffer<type> _buf;
 
-  int32_t _front;
-  int32_t _count;
+  uint32_t _front;
+  uint32_t _count;
 };

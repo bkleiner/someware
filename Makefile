@@ -1,5 +1,4 @@
 TARGET=someware
-OBJECT_DIR=build
 
 CXX=arm-none-eabi-g++
 CC=arm-none-eabi-gcc
@@ -20,52 +19,66 @@ INCLUDE = src src/target/stm32_f3 \
 	lib/STM32_USB-FS-Device_Driver/inc \
 	lib/STM32F3/Drivers/CMSIS/Device/ST/STM32F30x \
 	lib/STM32F3/Drivers/STM32F30x_StdPeriph_Driver/inc
-	
 
-SRC = $(TARGET_STARTUP) $(shell find src -name *.cpp -or -name *.c) \
-	$(wildcard lib/STM32_USB-FS-Device_Driver/src/*.c) \
+BUILD_DIR=build
+
+LIB_SOURCE = $(wildcard lib/STM32_USB-FS-Device_Driver/src/*.c) \
 	$(wildcard lib/STM32F3/Drivers/CMSIS/Device/ST/STM32F30x/*.c) \
 	$(wildcard lib/STM32F3/Drivers/STM32F30x_StdPeriph_Driver/src/*.c)
+
+COMMON_SOURCE = $(shell find src/* -name '*.cpp' -or -name '*.c')
 	
-TARGET_OBJS = $(addsuffix .o,$(addprefix $(OBJECT_DIR)/$(TARGET)/,$(basename $(SRC))))
-TARGET_DIR = src/target/stm32_f3
-TARGET_STARTUP = $(TARGET_DIR)/startup_stm32f30x_md_gcc.S
+TARGET_DIR       = src/target/stm32_f3
+TARGET_STARTUP   = $(TARGET_DIR)/startup_stm32f30x_md_gcc.S
 TARGET_LD_SCRIPT = $(TARGET_DIR)/stm32_flash_f303_256k.ld
 
-OPTIMIZE = -g  -Wall
+TARGET_SOURCE = src/main.cpp $(TARGET_STARTUP) $(COMMON_SOURCE) $(LIB_SOURCE)
+TARGET_OBJS   = $(addsuffix .o,$(addprefix $(BUILD_DIR)/,$(basename $(TARGET_SOURCE))))
+
+TEST_FILES  = $(shell find test -name '*.cpp')
+TEST_BINS   = $(patsubst test/%.cpp,$(BUILD_DIR)/test/%,$(TEST_FILES))
+
+OPTIMIZE = -g -Wall
 CFLAGS   = $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
 CXXFLAGS = -fno-rtti -std=c++11 $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
+HOST_CXXFLAGS = -fno-rtti -std=c++11 $(OPTIMIZE) $(DEVICE_FLAGS)
 LDFLAGS  = -lm -lc -lnosys --specs=nano.specs -u _printf_float -nostartfiles $(ARCH_FLAGS) $(DEVICE_FLAGS) -static -Wl,-L$(TARGET_DIR) -T$(TARGET_LD_SCRIPT) -Wl,-gc-sections
 ASFLAGS  = $(ARCH_FLAGS) -x assembler-with-cpp $(addprefix -I,$(INCLUDE)) -MMD -MP
 
-.PHONY: $(TARGET)
+.PHONY: all
 
-$(TARGET): $(TARGET).bin
+all: $(TARGET) $(TEST_BINS) 
 
-$(TARGET).bin: $(TARGET).elf
-	$(CP) -O binary $(TARGET).elf $(TARGET).bin
+$(TEST_BINS): $(TEST_FILES)
+	mkdir -p $(@D)
+	g++ -o $@ $(addprefix -I,$(INCLUDE)) $(HOST_CXXFLAGS) $^ 
 
-$(TARGET).elf: $(TARGET_OBJS)
+$(TARGET): $(BUILD_DIR)/$(TARGET).bin
+
+$(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET).elf
+	$(CP) -O binary $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
+
+$(BUILD_DIR)/$(TARGET).elf: $(TARGET_OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^ 
 
-$(OBJECT_DIR)/$(TARGET)/%.o: %.c
+$(BUILD_DIR)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) -c -o $@ $(addprefix -I,$(INCLUDE)) $(CFLAGS) $^ 
 
-$(OBJECT_DIR)/$(TARGET)/%.o: %.cpp
+$(BUILD_DIR)/%.o: %.cpp
 	mkdir -p $(@D)
 	$(CXX) -c -o $@ $(addprefix -I,$(INCLUDE)) $(CXXFLAGS) $^ 
 
-$(OBJECT_DIR)/$(TARGET)/%.o: %.s
+$(BUILD_DIR)/%.o: %.s
 	mkdir -p $(dir $@)
 	$(CC) -c -o $@ $(ASFLAGS) $<
 
-$(OBJECT_DIR)/$(TARGET)/%.o: %.S
+$(BUILD_DIR)/%.o: %.S
 	mkdir -p $(dir $@)
 	$(CC) -c -o $@ $(ASFLAGS) $<
 
 clean:
-	rm -rf $(OBJECT_DIR) $(TARGET).elf $(TARGET).bin
+	rm -rf $(BUILD_DIR)
 
 flash: $(TARGET).bin
 	(echo -n 'R' > /dev/ttyACM0 && sleep 2) || true
