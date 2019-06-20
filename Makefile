@@ -14,9 +14,10 @@ ARCH_FLAGS      = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fs
 DEVICE_FLAGS    = -DSTM32F303xC -DSTM32F303 -DUSE_STDPERIPH_DRIVER
 
 BUILD_DIR  = build
-TARGET_DIR = src/platform/stm32_f3 src/target/betaflight_f3
+PLATFORM_DIR = src/platform/stm32_f3
+TARGET_DIR = src/target/betaflight_f3
 
-INCLUDE = src $(TARGET_DIR) \
+INCLUDE = src $(PLATFORM_DIR) \
 	lib/delegate/include \
 	lib/CMSIS/Core/Include \
 	lib/STM32_USB-FS-Device_Driver/inc \
@@ -28,10 +29,9 @@ LIB_SOURCE = $(wildcard lib/STM32_USB-FS-Device_Driver/src/*.c) \
 	$(wildcard lib/STM32F3/Drivers/STM32F30x_StdPeriph_Driver/src/*.c)
 
 COMMON_SOURCE = $(shell find src/* -name '*.cpp' -or -name '*.c')
-	
 
-TARGET_STARTUP   = $(TARGET_DIR)/startup_stm32f30x_md_gcc.S
-TARGET_LD_SCRIPT = $(TARGET_DIR)/stm32_flash_f303_256k.ld
+TARGET_STARTUP   = $(PLATFORM_DIR)/startup_stm32f30x_md_gcc.S
+TARGET_LD_SCRIPT = $(PLATFORM_DIR)/stm32_flash_f303_256k.ld
 
 TARGET_SOURCE = src/main.cpp $(TARGET_STARTUP) $(COMMON_SOURCE) $(LIB_SOURCE)
 TARGET_OBJS   = $(addsuffix .o,$(addprefix $(BUILD_DIR)/,$(basename $(TARGET_SOURCE))))
@@ -39,11 +39,11 @@ TARGET_OBJS   = $(addsuffix .o,$(addprefix $(BUILD_DIR)/,$(basename $(TARGET_SOU
 TEST_FILES  = $(shell find test -name '*.cpp')
 TEST_BINS   = $(patsubst test/%.cpp,$(BUILD_DIR)/test/%,$(TEST_FILES))
 
-OPTIMIZE = -g -Wall
+OPTIMIZE = -g -O2 -Wall
 CFLAGS   = $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
 CXXFLAGS = -fno-rtti -std=c++11 $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
 HOST_CXXFLAGS = -fno-rtti -std=c++11 $(OPTIMIZE) $(DEVICE_FLAGS)
-LDFLAGS  = -lm -lc -lnosys --specs=nano.specs -u _printf_float -nostartfiles $(ARCH_FLAGS) $(DEVICE_FLAGS) -static -Wl,-L$(TARGET_DIR) -T$(TARGET_LD_SCRIPT) -Wl,-gc-sections
+LDFLAGS  = -lm -lc -lnosys --specs=nano.specs -u _printf_float -nostartfiles $(ARCH_FLAGS) $(DEVICE_FLAGS) -static -Wl,-L$(PLATFORM_DIR) -T$(TARGET_LD_SCRIPT) -Wl,-gc-sections
 ASFLAGS  = $(ARCH_FLAGS) -x assembler-with-cpp $(addprefix -I,$(INCLUDE)) -MMD -MP
 
 .PHONY: all
