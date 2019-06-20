@@ -119,7 +119,7 @@ bool serial_vcp::flush() {
   static uint8_t send_buffer[64];
 
   uint32_t count = 0;
-  for (size_t i = 0; i < VIRTUAL_COM_PORT_DATA_SIZE; i++) {
+  for (size_t i = 0; i < VIRTUAL_COM_PORT_DATA_SIZE - 1; i++) {
     if (!tx_buf.read(send_buffer + i)) {
       break;
     }

@@ -40,24 +40,11 @@ void print_sbus(serial& srl, rx::sbus& sbus, serial& rx) {
   auto buf = rx.read();
   for (int32_t i = 0; i < buf.size(); i++) {
     if (sbus.feed(buf[i])) {
-      auto channels = sbus.channels();
-
-      if (channels.flags & SBUS_FLAG_SIGNAL_LOSS) {
-        write_string(srl, "SBUS_FLAG_SIGNAL_LOSS\r\n");
-      } else if (channels.flags & SBUS_FLAG_FAILSAFE_ACTIVE) {
-        write_string(srl, "SBUS_FLAG_FAILSAFE_ACTIVE\r\n");
-      } else {
-        write_printf(
-          srl,
-          "THR: %.2f, AIL: %.2f, ELE: %.2f, RUD: %.2f, AUX1: %.2f, AUX2: %.2f\r\n",
-          util::map(channels.chan0, 172, 1811, -1, 1),
-          util::map(channels.chan1, 172, 1811, -1, 1),
-          util::map(channels.chan2, 172, 1811, -1, 1),
-          util::map(channels.chan3, 172, 1811, -1, 1),
-          util::map(channels.chan4, 172, 1811, -1, 1),
-          util::map(channels.chan5, 172, 1811, -1, 1)
-        );
-      }
+      write_printf(
+        srl,
+        "THR: %5.2f, AIL: %5.2f, ELE: %5.2f, RUD: %5.2f, AUX1: %5.2f, AUX2: %5.2f\r\n",
+        sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)
+      );
 
       i--;
     }
@@ -74,13 +61,13 @@ using mode_cs_pin = stm32_f3::gpio::mode<
 >;
 
 int main() {
-  bool dump_sbus = true;
+  bool dump_sbus = false;
   bool dump_gyro = false;
 
   stm32_f3::board board;
 
   stm32_f3::serial_usart rx;
-  rx::sbus sbus;
+  rx::sbus sbus(172, 1811);
 
   stm32_f3::spi spi;
   auto cs_pin = stm32_f3::gpio::pin<stm32_f3::gpio::port<stm32_f3::gpio::A, 15>, mode_cs_pin>();
@@ -89,14 +76,15 @@ int main() {
   auto& usb = board.usb_serial();
   while (1) {
     if (board.usb_serial_active()) {
-      if (dump_sbus) {
+
+      if (dump_sbus && (systick_count % 250) == 0) {
         print_sbus(usb, sbus, rx);
       }
 
       if (dump_gyro && (systick_count % 250) == 0) {
         const auto& gyro = mpu.read_gyro();
         write_printf(usb,
-          "%.3f,%.3f,%.3f\r\n", 
+          "%2.3f,%2.3f,%2.3f\r\n", 
           gyro[0], gyro[1], gyro[2]
         );
       }

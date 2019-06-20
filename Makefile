@@ -47,13 +47,20 @@ ASFLAGS  = $(ARCH_FLAGS) -x assembler-with-cpp $(addprefix -I,$(INCLUDE)) -MMD -
 
 .PHONY: all
 
-all: $(TARGET) $(TEST_BINS) 
+all: $(TARGET) $(TEST_BINS)
 
 $(TEST_BINS): $(TEST_FILES)
 	mkdir -p $(@D)
 	g++ -o $@ $(addprefix -I,$(INCLUDE)) $(HOST_CXXFLAGS) $^ 
 
 $(TARGET): $(BUILD_DIR)/$(TARGET).bin
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+flash: $(BUILD_DIR)/$(TARGET).bin
+	(echo -n 'R' > /dev/ttyACM0 && sleep 2) || true
+	$(DFU) -a 0 -s 0x08000000:leave -R -D $(BUILD_DIR)/$(TARGET).bin
 
 $(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET).elf
 	$(CP) -O binary $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
@@ -77,9 +84,3 @@ $(BUILD_DIR)/%.o: %.S
 	mkdir -p $(dir $@)
 	$(CC) -c -o $@ $(ASFLAGS) $<
 
-clean:
-	rm -rf $(BUILD_DIR)
-
-flash: $(TARGET).bin
-	(echo -n 'R' > /dev/ttyACM0 && sleep 2) || true
-	$(DFU) -a 0 -s 0x08000000:leave -R -D $(TARGET).bin

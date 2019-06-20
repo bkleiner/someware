@@ -1,5 +1,9 @@
 #include "sbus.h"
 
+
+
+
+
 namespace rx {
 
 bool sbus::feed(uint8_t v) {
@@ -29,10 +33,36 @@ bool sbus::feed(uint8_t v) {
   return false;
 }
 
-sbus_channel_data sbus::channels() {
+bool sbus::read_channels(int32_t* channel_data) {
+  if (state != DONE) {
+    return false;
+  }
+
   sbus_channel_data* data = reinterpret_cast<sbus_channel_data*>(frame + 1);
   state = IDLE;
-  return *data;
+
+  if (data->flags & SBUS_FLAG_SIGNAL_LOSS || data->flags & SBUS_FLAG_FAILSAFE_ACTIVE) {
+    return false;
+  }
+
+  channel_data[0] = data->chan0;
+  channel_data[1] = data->chan1;
+  channel_data[2] = data->chan2;
+  channel_data[3] = data->chan3;
+  channel_data[4] = data->chan4;
+  channel_data[5] = data->chan5;
+  channel_data[6] = data->chan6;
+  channel_data[7] = data->chan7;
+  channel_data[8] = data->chan8;
+  channel_data[9] = data->chan9;
+  channel_data[10] = data->chan10;
+  channel_data[11] = data->chan11;
+  channel_data[12] = data->chan12;
+  channel_data[13] = data->chan13;
+  channel_data[14] = data->chan14;
+  channel_data[15] = data->chan15;
+
+  return true;
 }
 
 }
