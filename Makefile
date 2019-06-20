@@ -13,14 +13,15 @@ DFU=dfu-util
 ARCH_FLAGS      = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fsingle-precision-constant -fno-exceptions -fno-non-call-exceptions -ffunction-sections -fdata-sections
 DEVICE_FLAGS    = -DSTM32F303xC -DSTM32F303 -DUSE_STDPERIPH_DRIVER
 
-INCLUDE = src src/target/stm32_f3 \
+BUILD_DIR  = build
+TARGET_DIR = src/platform/stm32_f3 src/target/betaflight_f3
+
+INCLUDE = src $(TARGET_DIR) \
 	lib/delegate/include \
 	lib/CMSIS/Core/Include \
 	lib/STM32_USB-FS-Device_Driver/inc \
 	lib/STM32F3/Drivers/CMSIS/Device/ST/STM32F30x \
 	lib/STM32F3/Drivers/STM32F30x_StdPeriph_Driver/inc
-
-BUILD_DIR=build
 
 LIB_SOURCE = $(wildcard lib/STM32_USB-FS-Device_Driver/src/*.c) \
 	$(wildcard lib/STM32F3/Drivers/CMSIS/Device/ST/STM32F30x/*.c) \
@@ -28,7 +29,7 @@ LIB_SOURCE = $(wildcard lib/STM32_USB-FS-Device_Driver/src/*.c) \
 
 COMMON_SOURCE = $(shell find src/* -name '*.cpp' -or -name '*.c')
 	
-TARGET_DIR       = src/target/stm32_f3
+
 TARGET_STARTUP   = $(TARGET_DIR)/startup_stm32f30x_md_gcc.S
 TARGET_LD_SCRIPT = $(TARGET_DIR)/stm32_flash_f303_256k.ld
 
