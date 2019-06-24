@@ -1,9 +1,12 @@
 #pragma once
 
 #include "driver/stm32_f3/gpio.h"
+#include "driver/stm32_f3/board.h"
+#include "driver/stm32_f3/serial_vcp.h"
 
 namespace stm32_f3 {
-  struct betaflight_f3 {
+  class betaflight_f3 : public board {
+  public:
     using USB_DM_PORT = gpio::port<gpio::A, 11>;
     using USB_DP_PORT = gpio::port<gpio::A, 12>;
 
@@ -19,5 +22,6 @@ namespace stm32_f3 {
     using MOTOR1_PORT = gpio::port<gpio::A, 7>;
     using MOTOR2_PORT = gpio::port<gpio::B, 8>;
     using MOTOR3_PORT = gpio::port<gpio::B, 9>;
+
   };
 }

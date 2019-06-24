@@ -84,6 +84,10 @@ public:
       delete[] _data;
   }
 
+  type* data() {
+    return _data;
+  }
+
   const type* data() const {
     return _data;
   }

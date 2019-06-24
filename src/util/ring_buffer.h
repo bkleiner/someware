@@ -29,14 +29,14 @@ public:
   }
 
   bool write(const type& t) {
-    if (full()) {
-      return false;
-    }
-
     const auto end = (_front + _count) % int32_t(_buf.size());
     _buf[end] = t;
-    _count++;
-    return true;
+    
+    if (!full()) {
+      _count++;
+      return true;
+    }
+    return false;
   }
 
   bool read(type* t) {
