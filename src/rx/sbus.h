@@ -2,6 +2,8 @@
 
 #include "rx.h"
 
+#include "driver/serial.h"
+
 namespace rx {
 
 struct __attribute__((__packed__)) sbus_channel_data {
@@ -43,16 +45,27 @@ public:
 
   sbus(int32_t low, int32_t high)
     : rx(low, high)
+    , frame(SBUS_FRAME_SIZE)
   {}
 
   bool feed(uint8_t v);
+
+  void update(serial& srl) {
+    auto buf = srl.read();
+    for (size_t i = 0; i < buf.size(); i++) {
+      if (feed(buf[i])) {
+        rx::update();
+        i--;
+      }
+    }
+  }
 
 protected:
   bool read_channels(int32_t* channel_data);
 
 private:
   sbus_states state = IDLE;
-  uint8_t frame[SBUS_FRAME_SIZE];
+  buffer<uint8_t> frame[SBUS_FRAME_SIZE];
   uint8_t frame_length = 0;
 };
 

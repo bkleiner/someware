@@ -1,3 +1,5 @@
+#pragma once
+
 #include "driver/board.h"
 
 #include "serial_vcp.h"
@@ -13,8 +15,8 @@ namespace stm32_f3 {
   public:
     board();
 
-    bool usb_serial_active();
-    serial_vcp& usb_serial() {
+    bool usb_serial_active() override;
+    serial& usb_serial() override {
       return vcp;
     }
     

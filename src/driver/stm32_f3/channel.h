@@ -5,7 +5,7 @@
 
 #include "timer.h"
 
-namespace stm32_f3::timer_channel {
+namespace stm32_f3::channel {
   enum names {
     CHANNEL1,
     CHANNEL2,
@@ -31,6 +31,23 @@ namespace stm32_f3::timer_channel {
         break;
       }
     }
+
+    static inline void set_compare(TIM_TypeDef* tim, uint32_t v) {
+      switch (_name) {
+      case CHANNEL1:
+        TIM_SetCompare1(tim, v);
+        break;
+      case CHANNEL2:
+        TIM_SetCompare2(tim, v);
+        break;
+      case CHANNEL3:
+        TIM_SetCompare3(tim, v);
+        break;
+      case CHANNEL4:
+        TIM_SetCompare4(tim, v);
+        break;
+      }
+    }
   };
 
   template<
@@ -46,9 +63,15 @@ namespace stm32_f3::timer_channel {
     channel() {
       TIM_OCInitTypeDef channel_init;
       channel_init.TIM_OCMode = _mode;
+      channel_init.TIM_OutputState = TIM_OutputState_Enable;
+      channel_init.TIM_OCPolarity = TIM_OCPolarity_High;
+      channel_init.TIM_OCIdleState = TIM_OCIdleState_Set;
       channel_init.TIM_Pulse = _pulse;
+      hw::init(timer::hw::get(), &channel_init);
+    }
 
-      hw::init(timer::hw::get(), channel_init);
+    void set_compare(uint32_t v) {
+      hw::set_compare(timer::hw::get(), v);
     }
   };
 }

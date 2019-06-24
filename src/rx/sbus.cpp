@@ -1,9 +1,5 @@
 #include "sbus.h"
 
-
-
-
-
 namespace rx {
 
 bool sbus::feed(uint8_t v) {

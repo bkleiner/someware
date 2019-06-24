@@ -41,8 +41,8 @@ TEST_BINS   = $(patsubst test/%.cpp,$(BUILD_DIR)/test/%,$(TEST_FILES))
 
 OPTIMIZE = -g -O2 -Wall
 CFLAGS   = $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
-CXXFLAGS = -fno-rtti -std=c++11 $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
-HOST_CXXFLAGS = -fno-rtti -std=c++11 $(OPTIMIZE) $(DEVICE_FLAGS)
+CXXFLAGS = -fno-rtti -std=c++17 $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
+HOST_CXXFLAGS = -fno-rtti -std=c++17 $(OPTIMIZE) $(DEVICE_FLAGS)
 LDFLAGS  = -lm -lc -lnosys --specs=nano.specs -u _printf_float -nostartfiles $(ARCH_FLAGS) $(DEVICE_FLAGS) -static -Wl,-L$(PLATFORM_DIR) -T$(TARGET_LD_SCRIPT) -Wl,-gc-sections
 ASFLAGS  = $(ARCH_FLAGS) -x assembler-with-cpp $(addprefix -I,$(INCLUDE)) -MMD -MP
 

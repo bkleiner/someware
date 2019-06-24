@@ -148,6 +148,7 @@ int16_t bytes_to_short(uint8_t a, uint8_t b) {
   return int16_t(int16_t(a) << 8 | b);
 }
 
+namespace accel {
 mpu_6000::mpu_6000(spi* bus, gpio::pin* cs)
   : bus(bus)
   , cs(cs)
@@ -254,4 +255,5 @@ void mpu_6000::calibrate() {
   gyro_bias[0] = gyro_samples[0] / float(max_samples);
   gyro_bias[1] = gyro_samples[1] / float(max_samples);
   gyro_bias[2] = gyro_samples[2] / float(max_samples);
+}
 }

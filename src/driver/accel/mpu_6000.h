@@ -4,19 +4,23 @@
 
 #include "driver/spi.h"
 #include "driver/gpio.h"
+#include "driver/accel.h"
 
-class mpu_6000 {
-public:
-  mpu_6000(spi* bus, gpio::pin* cs);
+namespace accel {
+  class mpu_6000 : public accel {
+  public:
+    mpu_6000(spi* bus, gpio::pin* cs);
 
-  void calibrate();
+    void calibrate() override;
 
-  float read_temparture();
-  buffer<float> read_gyro();
-  buffer<int16_t> read_accel();
+    float read_temparture() override;
+    buffer<float> read_gyro() override;
+    buffer<int16_t> read_accel() override;
 
-private:
-  spi* bus;
-  gpio::pin* cs;
-  float gyro_bias[3];
-};
+  private:
+    spi* bus;
+    gpio::pin* cs;
+    float gyro_bias[3];
+  };
+}
+
