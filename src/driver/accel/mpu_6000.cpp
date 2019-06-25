@@ -179,27 +179,24 @@ mpu_6000::mpu_6000(spi* bus, gpio::pin* cs)
 
   // Accel Sample Rate 1kHz
   // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-  bus->bus_write_register(cs, MPU_RA_SMPLRT_DIV, 0x00);
+  bus->bus_write_register(cs, MPU_RA_SMPLRT_DIV, 0x02);
   delay(10);
 
-  bus->bus_write_register(cs, MPU6000_CONFIG, BITS_DLPF_CFG_98HZ);
+  bus->bus_write_register(cs, MPU6000_CONFIG, BITS_DLPF_CFG_42HZ);
   delay(10);
 
-  // Gyro +/- 1000 DPS Full Scale
-  bus->bus_write_register(cs, MPU_RA_GYRO_CONFIG, BITS_FS_1000DPS);
+  // Gyro +/- 2000 DPS Full Scale
+  bus->bus_write_register(cs, MPU_RA_GYRO_CONFIG, BITS_FS_2000DPS);
   delay(10);
 
   // Accel +/- 16 G Full Scale
-  bus->bus_write_register(cs, MPU_RA_ACCEL_CONFIG, BITS_FS_8G);
+  bus->bus_write_register(cs, MPU_RA_ACCEL_CONFIG, BITS_FS_16G);
   delay(10);
 
   bus->bus_write_register(cs, MPU_RA_INT_ENABLE, 0x00);
   delay(10);
 
   // bus->bus_write_register(cs, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
-  // delay(10);
-
-  // bus->bus_write_register(cs, MPU_RA_INT_ENABLE, MPU_RF_DATA_RDY_EN);
   // delay(10);
 
   bus->set_divisor(spi::SPI_CLOCK_FAST);
@@ -212,7 +209,7 @@ float mpu_6000::read_temparture() {
 }
 
 float tranform_gyro(int16_t value) {
-  return float(value) / (32768.f / 1000.f);
+  return float(value) / (32768.f / 2000.f);
 }
 
 vector mpu_6000::read_gyro() {
@@ -248,11 +245,11 @@ void mpu_6000::calibrate() {
     gyro_samples[1] += tranform_gyro(bytes_to_short(data[2], data[3]));
     gyro_samples[2] += tranform_gyro(bytes_to_short(data[4], data[5]));
 
-    delay(5);
+    delay(2);
   }
 
-  gyro_bias[0] = gyro_samples[0] / float(max_samples);
-  gyro_bias[1] = gyro_samples[1] / float(max_samples);
-  gyro_bias[2] = gyro_samples[2] / float(max_samples);
+  gyro_bias[0] = gyro_samples[0] / double(max_samples);
+  gyro_bias[1] = gyro_samples[1] / double(max_samples);
+  gyro_bias[2] = gyro_samples[2] / double(max_samples);
 }
 }

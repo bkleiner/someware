@@ -49,19 +49,10 @@ public:
   {}
 
   bool feed(uint8_t v);
-
-  void update(serial& srl) {
-    auto buf = srl.read();
-    for (size_t i = 0; i < buf.size(); i++) {
-      if (feed(buf[i])) {
-        rx::update();
-        i--;
-      }
-    }
-  }
+  void update(serial& srl);
 
 protected:
-  bool read_channels(int32_t* channel_data);
+  bool read_channels(buffer<int32_t>& channel_data);
 
 private:
   sbus_states state = IDLE;

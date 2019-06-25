@@ -24,21 +24,24 @@ namespace control {
     }
 
     float calc_axis(float dt, uint8_t axis, const vector& error, const vector& gyro) {
-      /*
+      // P Term 
+      float out = error[axis] * pidkp[axis];
+
+      // I term
       ierror[axis] = 
         ierror[axis] + 0.166666f * 
         (lasterror2[axis] + 4 * lasterror[axis] + error[axis])
         * pidki[axis] * dt;
       lasterror2[axis] = lasterror[axis];
       lasterror[axis] = error[axis];
-      */
+      /*
       ierror[axis] = ierror[axis] + error[axis] * pidki[axis] * dt;
       lasterror[axis] = error[axis];
-
-      // P Term 
-      float out = error[axis] * pidkp[axis];
-
-      // I term	
+      */
+      /*
+      ierror[axis] = ierror[axis] + (error[axis] + lasterror[axis]) * 0.5f *  pidki[axis] * dt;
+      lasterror[axis] = error[axis];
+      */
       out += ierror[axis];
 
       // D term

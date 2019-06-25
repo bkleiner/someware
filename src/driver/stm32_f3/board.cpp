@@ -23,6 +23,7 @@ rc_controller::rc_controller() {
 board::board() 
   : rcc()
   , vcp()
+  , last_cycles(0)
 {
   if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
@@ -30,33 +31,37 @@ board::board()
     DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
   }
 }
-
-uint32_t DWT_Get(void)
-{
-  return DWT->CYCCNT;
-}
  
-__inline
-uint8_t DWT_Compare(int32_t tp)
-{
-  return (((int32_t)DWT_Get() - tp) < 0);
-}
-
-void delay_us(uint32_t us) {
-  int32_t tp = DWT_Get() + us * (SystemCoreClock/1000000);
-  while (DWT_Compare(tp));
-}
-
 bool board::usb_serial_active() {
   return bDeviceState == CONFIGURED;
 }
 
 float board::millis() {
-  return float(DWT_Get()) * float(SystemCoreClock / 1000000.0f) / 1000.0f;
+  return float(micros()) / 1000.0f;
 }
 
-uint64_t board::micros() {
-  return DWT_Get() * (SystemCoreClock/1000000);
+uint32_t board::micros() {
+  return cycles() / (SystemCoreClock / 1000000L);
+}
+
+void board::delay_us(uint64_t us) {
+  if (us <= 0) {
+    return;
+  }
+
+  volatile int64_t tp = cycles() + us * (SystemCoreClock/1000000);
+  while (true) {
+    volatile int64_t cycle = int64_t(cycles());
+    volatile int64_t delta = (cycle - tp);
+
+    if (delta <= 0)
+      break;
+  }
+}
+
+uint32_t board::cycles() {
+  volatile uint32_t cycle = DWT->CYCCNT;
+  return cycle;
 }
 
 void board::reset() {

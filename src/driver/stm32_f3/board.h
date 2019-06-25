@@ -21,12 +21,18 @@ namespace stm32_f3 {
     }
 
     float millis() override;
-    uint64_t micros() override;
+    uint32_t micros() override;
     
+    void delay_us(uint64_t us) override;
+    
+    uint32_t cycles();
+
     void reset() override;
     void reset_to_bootloader() override;
 
   private:
+    uint64_t last_cycles = 0;
+
     rc_controller rcc;
     serial_vcp vcp;
   };

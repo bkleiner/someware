@@ -35,13 +35,14 @@ TARGET_LD_SCRIPT = $(PLATFORM_DIR)/stm32_flash_f303_256k.ld
 
 TARGET_SOURCE = src/main.cpp $(TARGET_STARTUP) $(COMMON_SOURCE) $(LIB_SOURCE)
 TARGET_OBJS   = $(addsuffix .o,$(addprefix $(BUILD_DIR)/,$(basename $(TARGET_SOURCE))))
+TARGET_DEPS   = $(addsuffix .d,$(addprefix $(BUILD_DIR)/,$(basename $(TARGET_SOURCE))))
 
 TEST_FILES  = $(shell find test -name '*.cpp')
 TEST_BINS   = $(patsubst test/%.cpp,$(BUILD_DIR)/test/%,$(TEST_FILES))
 
 OPTIMIZE = -g -O2 -Wall
-CFLAGS   = $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
-CXXFLAGS = -fno-rtti -std=c++17 $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
+CFLAGS   = -MMD -MP $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
+CXXFLAGS = -MMD -MP -fno-rtti -std=c++17 $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
 HOST_CXXFLAGS = -fno-rtti -std=c++17 $(OPTIMIZE) $(DEVICE_FLAGS)
 LDFLAGS  = -lm -lc -lnosys --specs=nano.specs -u _printf_float -nostartfiles $(ARCH_FLAGS) $(DEVICE_FLAGS) -static -Wl,-L$(PLATFORM_DIR) -T$(TARGET_LD_SCRIPT) -Wl,-gc-sections
 ASFLAGS  = $(ARCH_FLAGS) -x assembler-with-cpp $(addprefix -I,$(INCLUDE)) -MMD -MP
@@ -71,11 +72,11 @@ $(BUILD_DIR)/$(TARGET).elf: $(TARGET_OBJS)
 
 $(BUILD_DIR)/%.o: %.c
 	mkdir -p $(@D)
-	$(CC) -c -o $@ $(addprefix -I,$(INCLUDE)) $(CFLAGS) $^ 
+	$(CC) $(addprefix -I,$(INCLUDE)) $(CFLAGS) -c $< -o $@  
 
 $(BUILD_DIR)/%.o: %.cpp
 	mkdir -p $(@D)
-	$(CXX) -c -o $@ $(addprefix -I,$(INCLUDE)) $(CXXFLAGS) $^ 
+	$(CXX) $(addprefix -I,$(INCLUDE)) $(CXXFLAGS) -c $< -o $@ 
 
 $(BUILD_DIR)/%.o: %.s
 	mkdir -p $(dir $@)
@@ -85,3 +86,4 @@ $(BUILD_DIR)/%.o: %.S
 	mkdir -p $(dir $@)
 	$(CC) -c -o $@ $(ASFLAGS) $<
 
+-include $(TARGET_DEPS)

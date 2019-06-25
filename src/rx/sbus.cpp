@@ -29,7 +29,17 @@ bool sbus::feed(uint8_t v) {
   return false;
 }
 
-bool sbus::read_channels(int32_t* channel_data) {
+void sbus::update(serial& srl) {
+  auto buf = srl.read();
+  for (size_t i = 0; i < buf.size(); i++) {
+    if (feed(buf[i])) {
+      rx::update();
+      i--;
+    }
+  }
+}
+
+bool sbus::read_channels(buffer<int32_t>& channel_data) {
   if (state != DONE) {
     return false;
   }

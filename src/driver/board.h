@@ -21,7 +21,8 @@ public:
   virtual serial& usb_serial() = 0;
 
   virtual float millis() = 0;
-  virtual uint64_t micros() = 0;
+  virtual uint32_t micros() = 0;
+  virtual void delay_us(uint64_t us) = 0;
 
   virtual accel::accel& accel() = 0;
   virtual pwm::pwm& motor(motor::motors) = 0;

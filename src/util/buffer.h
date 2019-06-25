@@ -15,7 +15,7 @@ public:
     : _size(size)
     , _data(new type[size])
   {
-    memset(_data, 0, _size);
+    fill(0);
   }
 
   explicit buffer(const void* stuff, size_t size) 
@@ -99,6 +99,10 @@ public:
 
   const type &operator[](int index) const {
     return _data[index];
+  }
+
+  void fill(const type v) {
+    memset(_data, v, _size);
   }
 
   size_t size() const {

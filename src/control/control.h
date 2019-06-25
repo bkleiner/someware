@@ -4,6 +4,7 @@
 #include "pid.h"
 
 #include "rx/rx.h"
+#include "util/timer.h"
 #include "driver/board.h"
 
 namespace control
@@ -17,6 +18,7 @@ namespace control
     {}
 
     void update(float dt, rx::rx& recv) {
+      // util::timer gyro_timer(brd, "control::update");
       if (!is_armed(recv)) {
         disarm();
         pid.reset();
@@ -42,7 +44,8 @@ namespace control
         rate_limit_deg * demands.yaw - gyro.yaw()
       };
 
-      const vector out = pid.calc(dt, error, gyro);
+      const float dts = dt / 1000.f;
+      const vector out = pid.calc(dts, error, gyro);
       demands.roll = out.roll() / rate_limit_deg;
       demands.pitch = out.pitch() / rate_limit_deg;
       demands.yaw = out.yaw() / rate_limit_deg;
@@ -55,10 +58,11 @@ namespace control
     }
 
     bool is_armed(rx::rx& recv) {
-      return recv.get(rx::AUX1) > 0.5f;
+      return arm_override || recv.get(rx::AUX1) > 0.5f;
     };
 
-    input_demands demands;
+    bool arm_override = false;
+    input_demands demands = {0, 0, 0, 0};
 
   private:
     const float rate_limit_deg = 60.f;
