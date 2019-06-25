@@ -19,6 +19,9 @@ namespace stm32_f3 {
     serial& usb_serial() override {
       return vcp;
     }
+
+    float millis() override;
+    uint64_t micros() override;
     
     void reset() override;
     void reset_to_bootloader() override;

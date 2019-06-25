@@ -215,16 +215,15 @@ float tranform_gyro(int16_t value) {
   return float(value) / (32768.f / 1000.f);
 }
 
-buffer<float> mpu_6000::read_gyro() {
+vector mpu_6000::read_gyro() {
   const auto& data = bus->bus_read_register_buffer(cs, MPU_RA_GYRO_XOUT_H, 6);
 
-  // filter before bias/offset? 
-  buffer<float> buf(3);
-  buf[0] = tranform_gyro(bytes_to_short(data[0], data[1])) - gyro_bias[0];
-  buf[1] = tranform_gyro(bytes_to_short(data[2], data[3])) - gyro_bias[1];
-  buf[2] = tranform_gyro(bytes_to_short(data[4], data[5])) - gyro_bias[2];
-
-  return buf;
+  // filter before bias/offset?
+  return vector(
+    tranform_gyro(bytes_to_short(data[0], data[1])) - gyro_bias[0],
+    tranform_gyro(bytes_to_short(data[2], data[3])) - gyro_bias[1],
+    tranform_gyro(bytes_to_short(data[4], data[5])) - gyro_bias[2]
+  );
 }
 
 buffer<int16_t> mpu_6000::read_accel() {

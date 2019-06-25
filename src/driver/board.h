@@ -20,6 +20,9 @@ public:
   virtual bool usb_serial_active() = 0;
   virtual serial& usb_serial() = 0;
 
+  virtual float millis() = 0;
+  virtual uint64_t micros() = 0;
+
   virtual accel::accel& accel() = 0;
   virtual pwm::pwm& motor(motor::motors) = 0;
 

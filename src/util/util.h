@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "math.h"
+#include "vector.h"
 #include "buffer.h"
 #include "ring_buffer.h"
 

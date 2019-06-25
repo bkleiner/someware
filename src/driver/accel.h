@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util/vector.h"
 #include "util/buffer.h"
 
 namespace accel {
@@ -9,7 +10,7 @@ namespace accel {
     virtual void calibrate() = 0;
     
     virtual float read_temparture() = 0;
-    virtual buffer<float> read_gyro() = 0;
+    virtual vector read_gyro() = 0;
     virtual buffer<int16_t> read_accel() = 0;
   };
 

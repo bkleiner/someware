@@ -65,7 +65,7 @@ protected:
 
 private:
   sbus_states state = IDLE;
-  buffer<uint8_t> frame[SBUS_FRAME_SIZE];
+  buffer<uint8_t> frame;
   uint8_t frame_length = 0;
 };
 

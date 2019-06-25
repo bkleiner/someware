@@ -1,7 +1,5 @@
 #pragma once
 
-#include "util/util.h"
-
 #include "driver/spi.h"
 #include "driver/gpio.h"
 #include "driver/accel.h"
@@ -14,13 +12,13 @@ namespace accel {
     void calibrate() override;
 
     float read_temparture() override;
-    buffer<float> read_gyro() override;
+    vector read_gyro() override;
     buffer<int16_t> read_accel() override;
 
   private:
     spi* bus;
     gpio::pin* cs;
-    float gyro_bias[3];
+    vector gyro_bias;
   };
 }
 

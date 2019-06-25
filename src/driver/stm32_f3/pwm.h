@@ -33,7 +33,7 @@ namespace stm32_f3 {
     }
 
     void set(float v) {
-      channel.set_compare(v * PWM_PERIOD);
+      channel.set_compare(uint32_t(v * PWM_PERIOD));
     }
   };
 }

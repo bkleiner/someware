@@ -34,7 +34,7 @@ bool sbus::read_channels(int32_t* channel_data) {
     return false;
   }
 
-  sbus_channel_data* data = reinterpret_cast<sbus_channel_data*>(frame + 1);
+  sbus_channel_data* data = reinterpret_cast<sbus_channel_data*>(frame.data() + 1);
   state = IDLE;
 
   if (data->flags & SBUS_FLAG_SIGNAL_LOSS || data->flags & SBUS_FLAG_FAILSAFE_ACTIVE) {

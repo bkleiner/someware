@@ -14,6 +14,7 @@ namespace control {
   struct console {
     bool dump_sbus = false;
     bool dump_gyro = false;
+    bool dump_ctrl = false;
 
     uint32_t motor_speed = 0;
 
@@ -40,7 +41,7 @@ namespace control {
       write_string(srl, str);
     }
 
-    void update(board& brd, rx::rx& sbus, control& ctrl) {
+    void update(float dt, board& brd, rx::rx& sbus, control& ctrl) {
       auto& usb = brd.usb_serial();
 
       if (dump_sbus && (systick_count % 250) == 0) {
@@ -49,19 +50,25 @@ namespace control {
           "THR: %5.2f, AIL: %5.2f, ELE: %5.2f, RUD: %5.2f, AUX1: %5.2f, AUX2: %5.2f\r\n",
           sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)
         );
-
+      }
+      if (dump_ctrl && (systick_count % 250) == 0) {
         write_printf(
           usb,
-          "ARMED: %d\r\n",
-          ctrl.is_armed(sbus)
+          "DT: %f, ARMED: %d, THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
+          dt,
+          ctrl.is_armed(sbus),
+          ctrl.demands.throttle,
+          ctrl.demands.roll,
+          ctrl.demands.pitch,
+          ctrl.demands.yaw
         );
       }
 
       if (dump_gyro && (systick_count % 250) == 0) {
         const auto& gyro = brd.accel().read_gyro();
         write_printf(usb,
-          "%2.3f,%2.3f,%2.3f\r\n", 
-          gyro[0], gyro[1], gyro[2]
+          "roll: %2.3f, pitch: %2.3f, yaw: %2.3f\r\n", 
+          gyro.roll(), gyro.pitch(), gyro.yaw()
         );
       }
 
@@ -82,6 +89,10 @@ namespace control {
           case 'B':
             dump_sbus = !dump_sbus;
             write_printf(usb, "dump_sbus: %d\r\n", dump_sbus ? 1 : 0);
+            break;
+          case 'T':
+            dump_ctrl = !dump_ctrl;
+            write_printf(usb, "dump_ctrl: %d\r\n", dump_ctrl ? 1 : 0);
             break;
           case 'U':
             motor_speed++;

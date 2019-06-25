@@ -51,6 +51,14 @@ bool board::usb_serial_active() {
   return bDeviceState == CONFIGURED;
 }
 
+float board::millis() {
+  return float(DWT_Get()) * float(SystemCoreClock / 1000000.0f) / 1000.0f;
+}
+
+uint64_t board::micros() {
+  return DWT_Get() * (SystemCoreClock/1000000);
+}
+
 void board::reset() {
   NVIC_PriorityGroupConfig(0x04);
 }
