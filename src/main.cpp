@@ -33,10 +33,10 @@ int main() {
     {
       const auto now = board.micros();
       const auto delta = (now - start);
-      if (board.usb_serial_active() && (uint32_t(board.millis()) % 250) == 0)
-        board.usb_serial().printf(
-          "dt: %fms (%.2fkHz) now: %u start: %u last_time: %u delta: %u delay: %d\r\n",
-          dt, (1000.0f / dt) * 0.001f, now, start, last_time, delta, LOOPTIME - delta);
+      // if (board.usb_serial_active() && (start % 25000) == 0)
+      //   board.usb_serial().printf(
+      //     "dt: %fms (%.2fkHz) now: %u start: %u last_time: %u delta: %u delay: %d\r\n",
+      //     dt, (1000.0f / dt) * 0.001f, now, start, last_time, delta, LOOPTIME - delta);
       if (delta > 100 && delta < LOOPTIME)
         board.delay_us(LOOPTIME - delta);
     }

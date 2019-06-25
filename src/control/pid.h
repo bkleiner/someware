@@ -32,8 +32,6 @@ namespace control {
         ierror[axis] + 0.166666f * 
         (lasterror2[axis] + 4 * lasterror[axis] + error[axis])
         * pidki[axis] * dt;
-      lasterror2[axis] = lasterror[axis];
-      lasterror[axis] = error[axis];
       /*
       ierror[axis] = ierror[axis] + error[axis] * pidki[axis] * dt;
       lasterror[axis] = error[axis];
@@ -47,19 +45,20 @@ namespace control {
       // D term
       // skip yaw D term if not set               
       if (pidkd[axis] > 0) {
-        float dterm = -(gyro[axis] - lastrate[axis]) * pidkd[axis] * dt;
-		  	lastrate[axis] = gyro[axis];
-        out += dterm;
+        out -= ((error[axis] - lasterror[axis]) / dt) * pidkd[axis];
       }
+
+      lasterror2[axis] = lasterror[axis];
+      lasterror[axis] = error[axis];
 
       return out;
     };
 
   private:
     //                     ROLL       PITCH     YAW
-    const vector pidkp = { 21.5e-2, 21.5e-2, 10.5e-1 };
-    const vector pidki = {   14e-1,   15e-1,   15e-1 };	
-    const vector pidkd = {  7.4e-1,  7.4e-1,  5.5e-1 };
+    const vector pidkp = {    0.25,    0.25,    0.25 };
+    const vector pidki = {     1.0,     1.0,     1.0 };	
+    const vector pidkd = {     0.5,     0.5,     0.5 };
 
     vector ierror;
     vector lasterror;

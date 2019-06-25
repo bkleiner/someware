@@ -14,7 +14,7 @@ namespace control {
     {}
 
     void update(float dt, rx::rx& sbus, control& ctrl) {
-      auto time = uint32_t(brd->millis());
+      auto time = int32_t(brd->millis());
       auto& usb = brd->usb_serial();
 
       if ((time % 250) == 0) {
@@ -26,9 +26,7 @@ namespace control {
         }
         if (dump_ctrl) {
           usb.printf(
-            "DT: %fms, FREQ: %5.2fkHz, ARMED: %d, THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
-            dt,
-            (1000.f / dt) / 1000.f,
+            "ARMED: %d, THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
             ctrl.is_armed(sbus),
             ctrl.demands.throttle,
             ctrl.demands.roll,

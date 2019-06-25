@@ -32,11 +32,11 @@ public:
     const auto end = (_front + _count) % int32_t(_buf.size());
     _buf[end] = t;
     
-    if (!full()) {
-      _count++;
-      return true;
+    if (full()) {
+      return false;
     }
-    return false;
+    _count++;
+    return true;
   }
 
   bool read(type* t) {
