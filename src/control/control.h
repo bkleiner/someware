@@ -32,10 +32,10 @@ namespace control
       }
 
       demands = {
-        recv.get(rx::THR) * rc_rate.throttle,
-        recv.get(rx::AIL) * rc_rate.roll,
-        recv.get(rx::ELE) * rc_rate.pitch,
-        recv.get(rx::RUD) * rc_rate.yaw
+         recv.get(rx::THR) * rc_rate.throttle,
+        -recv.get(rx::AIL) * rc_rate.roll,
+         recv.get(rx::ELE) * rc_rate.pitch,
+         recv.get(rx::RUD) * rc_rate.yaw
       };
       const vector gyro = brd->accel().read_gyro();
       const vector rates = {
@@ -65,7 +65,7 @@ namespace control
     input_demands demands = {0, 0, 0, 0};
 
   private:
-    const float rate_limit_deg = 60.f;
+    const float rate_limit_deg = 180.f;
     const input_demands rc_rate = {
       1.0f, // T
       1.0f, // A
