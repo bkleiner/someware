@@ -38,17 +38,17 @@ namespace control
         recv.get(rx::RUD) * rc_rate.yaw
       };
       const vector gyro = brd->accel().read_gyro();
-      const vector error = {
-        rate_limit_deg * demands.roll - gyro.roll(),
-        rate_limit_deg * demands.pitch - gyro.pitch(),
-        rate_limit_deg * demands.yaw - gyro.yaw()
+      const vector rates = {
+        rate_limit_deg * demands.roll,
+        rate_limit_deg * demands.pitch,
+        rate_limit_deg * demands.yaw
       };
 
       const float dts = dt / 1000.f;
-      const vector out = pid.calc(dts, error, gyro);
-      demands.roll = out.roll() / rate_limit_deg;
-      demands.pitch = out.pitch() / rate_limit_deg;
-      demands.yaw = out.yaw() / rate_limit_deg;
+      const vector out = pid.calc(dts, rates, gyro);
+      demands.roll = out.roll();
+      demands.pitch = out.pitch();
+      demands.yaw = out.yaw();
 
       mix.set_demands(demands);
     }

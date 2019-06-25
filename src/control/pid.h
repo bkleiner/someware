@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "filter.h"
+
 #include "util/vector.h"
 
 namespace control {
@@ -15,15 +17,21 @@ namespace control {
       lastrate = vector(0);
     }
 
-    const vector calc(float dt, const vector& error, const vector& gyro) {
+    const vector calc(float dt, const vector& rate_setpoint, const vector& rate_actual) {
+      const vector error = {
+        rate_setpoint[0] - rate_actual[0],
+        rate_setpoint[1] - rate_actual[1],
+        rate_setpoint[2] - rate_actual[2]
+      };
+
       return vector{
-        calc_axis(dt, 0, error, gyro),
-        calc_axis(dt, 1, error, gyro),
-        calc_axis(dt, 2, error, gyro)
+        calc_axis(dt, 0, error),
+        calc_axis(dt, 1, error),
+        calc_axis(dt, 2, error)
       };
     }
 
-    float calc_axis(float dt, uint8_t axis, const vector& error, const vector& gyro) {
+    float calc_axis(float dt, uint8_t axis, const vector& error) {
       // P Term 
       float out = error[axis] * pidkp[axis];
 
@@ -51,14 +59,14 @@ namespace control {
       lasterror2[axis] = lasterror[axis];
       lasterror[axis] = error[axis];
 
-      return out;
+      return filter::constrain_min_max(out, -180.f, 180.f) / 180.f;
     };
 
   private:
     //                     ROLL       PITCH     YAW
-    const vector pidkp = {    0.25,    0.25,    0.25 };
+    const vector pidkp = {     0.1,     0.2,     0.2 };
     const vector pidki = {     1.0,     1.0,     1.0 };	
-    const vector pidkd = {     0.5,     0.5,     0.5 };
+    const vector pidkd = {    0.75,    0.75,    0.75 };
 
     vector ierror;
     vector lasterror;
