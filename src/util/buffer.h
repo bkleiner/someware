@@ -22,7 +22,7 @@ public:
   explicit buffer(const void* stuff, size_t size) 
     : buffer(size)
   {
-    memcpy(_data, stuff, size);
+    copy(stuff);
   }
 
   buffer(const buffer& other)
@@ -33,7 +33,7 @@ public:
       _size = other._size;
       _data = new type[_size];
 
-      memcpy(_data, other._data, _size);
+      copy(other._data);
     }
   }
 
@@ -49,7 +49,7 @@ public:
         _size = other._size;
         _data = new type[_size];
 
-        memcpy(_data, other._data, _size);
+        copy(other._data);
       }
     }
     return *this;
@@ -103,7 +103,7 @@ public:
   }
 
   void fill(const type v) {
-    memset(_data, v, _size);
+    memset(_data, v, _size * sizeof(type));
   }
 
   size_t size() const {
@@ -117,4 +117,8 @@ public:
 private:
   size_t _size;
   type* _data;
+
+  void copy(const void* src) {
+    memcpy(_data, data, _size * sizeof(type));
+  }
 };
