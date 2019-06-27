@@ -209,7 +209,8 @@ float mpu_6000::read_temparture() {
 }
 
 float tranform_gyro(int16_t value) {
-  return float(value) / (32768.f / 2000.f);
+  static constexpr const float factor = 2000.f / 32768.f;
+  return float(value) * factor;
 }
 
 vector mpu_6000::read_gyro() {

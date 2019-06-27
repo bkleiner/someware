@@ -18,10 +18,9 @@ bool sbus::feed(uint8_t v) {
     if (frame_length < SBUS_FRAME_SIZE) {
       frame[frame_length++] = v;
       return false;
-    } else {
-      state = DONE;
-      return true;
     }
+    state = DONE;
+    return true;
   case DONE:
     return true;
   }
@@ -39,7 +38,7 @@ void sbus::update(serial& srl) {
   }
 }
 
-bool sbus::read_channels(buffer<int32_t>& channel_data) {
+bool sbus::read_channels(buffer<uint32_t>& channel_data) {
   if (state != DONE) {
     return false;
   }
@@ -68,6 +67,7 @@ bool sbus::read_channels(buffer<int32_t>& channel_data) {
   channel_data[14] = data->chan14;
   channel_data[15] = data->chan15;
 
+  frame.fill(0);
   return true;
 }
 

@@ -45,23 +45,15 @@ uint32_t board::micros() {
 }
 
 void board::delay_us(uint64_t us) {
-  if (us <= 0) {
-    return;
-  }
-
-  volatile int64_t tp = cycles() + us * (SystemCoreClock/1000000);
-  while (true) {
-    volatile int64_t cycle = int64_t(cycles());
-    volatile int64_t delta = (cycle - tp);
-
-    if (delta <= 0)
-      break;
+  volatile uint32_t start = DWT->CYCCNT;
+  volatile uint32_t delay = us * (SystemCoreClock / 1000000L);
+  while (DWT->CYCCNT - start < delay) {
+    asm volatile ("nop");
   }
 }
 
 uint32_t board::cycles() {
-  volatile uint32_t cycle = DWT->CYCCNT;
-  return cycle;
+  return DWT->CYCCNT;
 }
 
 void board::reset() {

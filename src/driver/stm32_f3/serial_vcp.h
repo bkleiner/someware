@@ -10,6 +10,7 @@ namespace stm32_f3 {
     buffer<uint8_t> read();
     bool write(uint8_t);
     bool flush();
+    bool is_active();
 
   private:
     void tx_callback();

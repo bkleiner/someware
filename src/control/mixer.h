@@ -6,7 +6,7 @@
 
 namespace control {
 
-  struct input_demands {
+  struct demands {
     float throttle; // T
     float roll; 	  // A
     float pitch;	  // E
@@ -31,7 +31,7 @@ namespace control {
         brd->motor(motor::motors(i)).set(0.f);
     }
 
-    void set_demands(input_demands d) {
+    void set_demands(demands d) {
       float thr = (d.throttle + 1.0f) / 2.0f;
       for (uint8_t i = 0; i < motor_count; i++) {
           motors[i] = 

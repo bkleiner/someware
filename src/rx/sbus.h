@@ -43,16 +43,18 @@ public:
     DONE
   };
 
-  sbus(int32_t low, int32_t high)
+  sbus(uint32_t low, uint32_t high)
     : rx(low, high)
     , frame(SBUS_FRAME_SIZE)
-  {}
+  {
+    frame.fill(0);
+  }
 
   bool feed(uint8_t v);
   void update(serial& srl);
 
 protected:
-  bool read_channels(buffer<int32_t>& channel_data);
+  bool read_channels(buffer<uint32_t>& channel_data);
 
 private:
   sbus_states state = IDLE;

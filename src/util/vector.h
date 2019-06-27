@@ -2,6 +2,12 @@
 
 class vector {
 public:
+  enum AXIS {
+    ROLL,
+    PITCH,
+    YAW
+  };
+
   vector()
     : vector(0.f)
   {}

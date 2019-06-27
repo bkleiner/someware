@@ -2,6 +2,8 @@
 
 namespace util {
 
+  static const constexpr float pi = 3.14159265358979323846;
+
   template<class T>
   static T min(const T a, const T b) {
     return a < b ? a : b;

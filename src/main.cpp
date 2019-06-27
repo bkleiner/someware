@@ -5,7 +5,8 @@
 
 #include "rx/sbus.h"
 
-#define LOOPTIME 500
+#define LOOP_FREQ_HZ 2000
+#define LOOP_TIME (1000000 / LOOP_FREQ_HZ)
 
 int main() {
   stm32_f3::betaflight_f3 board;
@@ -22,7 +23,6 @@ int main() {
     last_time = start;
 
     {
-      // util::timer tick_timer(&board, "tick");
       sbus.update(board.uart2);
       ctrl.update(dt, sbus);
 
@@ -33,12 +33,16 @@ int main() {
     {
       const auto now = board.micros();
       const auto delta = (now - start);
-      // if (board.usb_serial_active() && (start % 25000) == 0)
-      //   board.usb_serial().printf(
-      //     "dt: %fms (%.2fkHz) now: %u start: %u last_time: %u delta: %u delay: %d\r\n",
-      //     dt, (1000.0f / dt) * 0.001f, now, start, last_time, delta, LOOPTIME - delta);
-      if (delta > 100 && delta < LOOPTIME)
-        board.delay_us(LOOPTIME - delta);
+
+      if (board.usb_serial_active()) {
+        // board.usb_serial().printf(
+        //   "dt: %fms (%.2fkHz) now: %u start: %u last_time: %u delta: %u delay: %d\r\n",
+        //   dt, (1000.0f / dt) * 0.001f, now, start, last_time, delta, LOOP_TIME - delta
+        // );
+      }
+
+      if (delta > 0 && delta < LOOP_TIME)
+        board.delay_us(LOOP_TIME - delta);
     }
   }
 }

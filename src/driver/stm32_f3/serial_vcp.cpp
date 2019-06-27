@@ -9,11 +9,11 @@
 
 extern LINE_CODING linecoding;
 
-uint8_t Receive_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
-uint8_t Receive_length = 0;
+volatile uint8_t Receive_Buffer[VIRTUAL_COM_PORT_DATA_SIZE];
+volatile uint8_t Receive_length = 0;
 
-uint32_t packet_sent = 0;
-uint32_t packet_receive = 1;
+volatile uint32_t packet_sent = 0;
+volatile uint32_t packet_receive = 1;
 
 delegate<void()> tx_delegate;
 
@@ -94,9 +94,13 @@ void serial_vcp::tx_callback() {
   packet_sent = 0;
 }
 
+bool serial_vcp::is_active() {
+  return bDeviceState == CONFIGURED;
+}
+
 buffer<uint8_t> serial_vcp::read() {
-  if (packet_receive) {
-    buffer<uint8_t> buf(Receive_Buffer, Receive_length);
+  if (is_active() && packet_receive) {
+    buffer<uint8_t> buf((uint8_t*)Receive_Buffer, Receive_length);
 
     SetEPRxValid(ENDP3);
     Receive_length = 0;
@@ -108,7 +112,7 @@ buffer<uint8_t> serial_vcp::read() {
 }
 
 bool serial_vcp::flush() {
-  if (tx_buf.empty()) {
+  if (!is_active() || tx_buf.empty()) {
     return false;
   }
 
@@ -125,10 +129,12 @@ bool serial_vcp::flush() {
     }
     count++;
   }
-  UserToPMABufferCopy((unsigned char*)send_buffer, ENDP1_TXADDR, count);
-  SetEPTxCount(ENDP1, count);
-  SetEPTxValid(ENDP1);
-  packet_sent = count;
+  if (count) {
+    UserToPMABufferCopy((unsigned char*)send_buffer, ENDP1_TXADDR, count);
+    SetEPTxCount(ENDP1, count);
+    packet_sent = count;
+    SetEPTxValid(ENDP1);
+  }
 
   return true;
 }
