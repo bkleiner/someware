@@ -119,6 +119,6 @@ private:
   type* _data;
 
   void copy(const void* src) {
-    memcpy(_data, data, _size * sizeof(type));
+    memcpy(_data, src, _size * sizeof(type));
   }
 };

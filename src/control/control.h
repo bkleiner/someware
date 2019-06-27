@@ -2,6 +2,7 @@
 
 #include "mixer.h"
 #include "pid.h"
+#include "config.h"
 
 #include "rx/rx.h"
 #include "util/timer.h"
@@ -16,7 +17,8 @@ namespace control
       , brd(brd)
       , mix(brd)
     {
-      brd->accel().calibrate();
+      cfg = *((config*)brd->flash().pointer());
+      brd->accel().set_bias(cfg.gyro_bias);
     }
 
     void update(float dt, rx::rx& recv) {
@@ -66,6 +68,12 @@ namespace control
       }
     }
 
+    vector calibrate_gyro() {
+      cfg.gyro_bias = brd->accel().calibrate();
+      cfg.save(brd->flash());
+      return cfg.gyro_bias;
+    }
+
     bool arm_override = false;
     
     vector gyro = {0, 0, 0};
@@ -74,6 +82,8 @@ namespace control
     demands output_demands = {0, 0, 0, 0};
 
     pid_controller pid;
+    config cfg;
+
   private:
     const float rate_limit_deg = 180.f;
     const demands rc_rate = {

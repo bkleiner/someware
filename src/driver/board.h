@@ -3,6 +3,7 @@
 #include "pwm.h"
 #include "accel.h"
 #include "serial.h"
+#include "flash.h"
 
 namespace motor
 {
@@ -25,6 +26,7 @@ public:
   virtual void delay_us(uint64_t us) = 0;
 
   virtual accel::accel& accel() = 0;
+  virtual flash_memory& flash() = 0;
   virtual pwm::pwm& motor(motor::motors) = 0;
 
   virtual void reset() = 0;

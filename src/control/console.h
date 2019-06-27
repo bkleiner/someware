@@ -79,9 +79,16 @@ namespace control {
             ctrl.arm_override = !ctrl.arm_override;
             usb.printf("arm_override: %d\r\n", ctrl.arm_override ? 1 : 0);
             break;
-          case 'C':
-            brd->accel().calibrate();
+          case 'C': {
+            const auto& bias = ctrl.calibrate_gyro();
+            usb.printf(
+              "gyro_bias: %5.2f %5.2f %5.2f\r\n",
+              bias[0],
+              bias[1],
+              bias[2]
+            );
             break;
+          }
           case 'T':
             dump_ctrl = !dump_ctrl;
             usb.printf("dump_ctrl: %d\r\n", dump_ctrl ? 1 : 0);

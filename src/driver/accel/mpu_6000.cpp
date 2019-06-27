@@ -235,7 +235,7 @@ buffer<int16_t> mpu_6000::read_accel() {
   return buf;
 }
 
-void mpu_6000::calibrate() {
+vector mpu_6000::calibrate() {
   const int32_t max_samples = 500;
 
   double gyro_samples[3] = {0, 0, 0};
@@ -252,5 +252,7 @@ void mpu_6000::calibrate() {
   gyro_bias[0] = gyro_samples[0] / double(max_samples);
   gyro_bias[1] = gyro_samples[1] / double(max_samples);
   gyro_bias[2] = gyro_samples[2] / double(max_samples);
+
+  return gyro_bias;
 }
 }
