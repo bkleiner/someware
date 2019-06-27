@@ -179,10 +179,10 @@ mpu_6000::mpu_6000(spi* bus, gpio::pin* cs)
 
   // Accel Sample Rate 1kHz
   // Gyroscope Output Rate =  1kHz when the DLPF is enabled
-  bus->bus_write_register(cs, MPU_RA_SMPLRT_DIV, 0x02);
+  bus->bus_write_register(cs, MPU_RA_SMPLRT_DIV, 0x00);
   delay(10);
 
-  bus->bus_write_register(cs, MPU6000_CONFIG, BITS_DLPF_CFG_42HZ);
+  bus->bus_write_register(cs, MPU6000_CONFIG, BITS_DLPF_CFG_256HZ);
   delay(10);
 
   // Gyro +/- 2000 DPS Full Scale

@@ -51,7 +51,7 @@ namespace control::filter {
 
       const float K = temp_p * (1.0f / (temp_p + R));
       const float estimation = temp_est + K * (in - temp_est);
-      const float P = (1- K) * temp_p;
+      const float P = (1 - K) * temp_p;
     
       //update our last's 
       last_prediction[axis] = P; 
