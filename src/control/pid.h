@@ -71,15 +71,7 @@ namespace control {
         iterm[axis] + 1/6 * 
         (lasterror2[axis] + 4 * lasterror[axis] + error[axis])
         * pidki[axis] * dts;
-      // iterm[axis] = filter::constrain_min_max(iterm[axis], -integral_limit[axis], integral_limit[axis]);
-      /*
-      ierror[axis] = ierror[axis] + error[axis] * pidki[axis] * dt;
-      lasterror[axis] = error[axis];
-      */
-      /*
-      ierror[axis] = ierror[axis] + (error[axis] + lasterror[axis]) * 0.5f *  pidki[axis] * dt;
-      lasterror[axis] = error[axis];
-      */
+      iterm[axis] = filter::constrain_min_max(iterm[axis], -integral_limit[axis], integral_limit[axis]);
 
       // D term
       // skip yaw D term if not set
