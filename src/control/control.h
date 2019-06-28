@@ -43,7 +43,7 @@ namespace control
         input_demands.pitch * rate_limit_deg * (util::pi / 180.0f),
         input_demands.yaw * rate_limit_deg * (util::pi / 180.0f)
       };
-      const vector out = pid.calc(dt, is_airborn(), rates, gyro);
+      const vector out = rate_pid.calc(dt, is_airborn(), rates, gyro);
       output_demands = {
         input_demands.throttle,
         out.roll(),
@@ -95,7 +95,7 @@ namespace control
     demands input_demands = {0, 0, 0, 0};
     demands output_demands = {0, 0, 0, 0};
 
-    pid_controller pid;
+    pid::rate_controller rate_pid;
     config cfg;
 
   private:

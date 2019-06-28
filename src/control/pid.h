@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 
 #include "filter.h"
@@ -31,9 +32,9 @@ float lpf2(float in, int axis) {
   return ans;
 }
 
-namespace control {
+namespace control::pid {
 
-  class pid_controller {
+  class rate_controller {
   public:
     void reset() {
       pterm = vector(0);
@@ -107,5 +108,50 @@ namespace control {
     vector lasterror2;
 
     vector lastrate;
+  };
+
+  class angle_controller {
+  public:
+
+    const vector calc(float dt, const vector& rate_setpoint, const vector& rate_actual) {
+      const vector error = rate_setpoint - rate_actual;
+
+      return vector{
+        calc_axis(dt, 0, error, rate_actual),
+        calc_axis(dt, 1, error, rate_actual),
+        calc_axis(dt, 2, error, rate_actual)
+      };
+    }
+
+    float calc_axis(float dt, uint8_t axis, const vector& error, const vector& actual) {
+      const float one_over_dt = 1.0f / dt;
+
+      // P term 1 weighted
+      float output1 = (1.0f - fabsf(error[axis])) * error[axis] * pidkp1;
+      // D term 1 weighted + P term 1 weighted
+      output1 += (error[axis] - lasterror[axis]) * pidkd1 * (1-fabsf(error[axis])) * one_over_dt;
+      
+      // P term 2 weighted
+      float output2 = fabsf(error[axis]) * error[axis] * pidkp2;
+      // D term 2 weighted + P term 2 weighted
+      output2 += ((error[axis] - lasterror[axis]) * pidkd2 * fabsf(error[axis]) * one_over_dt);
+      
+      // apidoutput sum
+      const float output = output1 + output2;
+      lasterror[axis] = error[axis];
+      
+      return filter::constrain_min_max(output, -output_limit, output_limit);
+    }
+
+  private:
+    const float pidkp1 = 10.0;
+    const float pidkd1 =  3.0;
+
+    const float pidkp2 = 5.0;
+    const float pidkd2 = 0.0;
+
+    const float output_limit = pidkp1 + pidkd1;
+
+    vector lasterror;
   };
 }

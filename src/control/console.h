@@ -43,21 +43,21 @@ namespace control {
         );
         usb.printf(
           "PTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
-          ctrl.pid.pterm.roll(),
-          ctrl.pid.pterm.pitch(),
-          ctrl.pid.pterm.yaw()
+          ctrl.rate_pid.pterm.roll(),
+          ctrl.rate_pid.pterm.pitch(),
+          ctrl.rate_pid.pterm.yaw()
         );
         usb.printf(
           "ITERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
-          ctrl.pid.iterm.roll(),
-          ctrl.pid.iterm.pitch(),
-          ctrl.pid.iterm.yaw()
+          ctrl.rate_pid.iterm.roll(),
+          ctrl.rate_pid.iterm.pitch(),
+          ctrl.rate_pid.iterm.yaw()
         );
         usb.printf(
           "DTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
-          ctrl.pid.dterm.roll(),
-          ctrl.pid.dterm.pitch(),
-          ctrl.pid.dterm.yaw()
+          ctrl.rate_pid.dterm.roll(),
+          ctrl.rate_pid.dterm.pitch(),
+          ctrl.rate_pid.dterm.yaw()
         );
         usb.printf(
           "OUTPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
