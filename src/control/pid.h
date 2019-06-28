@@ -6,30 +6,30 @@
 
 #include "util/vector.h"
 
-#define FILTERCALC(sampleperiod, filtertime) (1.0f - ( 6.0f*(float)sampleperiod) / ( 3.0f *(float)sampleperiod + (float)filtertime))
 
 #ifndef DTERM_LPF_2ND_HZ 
 #define DTERM_LPF_2ND_HZ 99
 #endif
 
-//the compiler calculates these
-static float two_one_minus_alpha = 2*FILTERCALC(0.001, (1.0f/DTERM_LPF_2ND_HZ) );
-static float one_minus_alpha_sqr = (FILTERCALC(0.001, (1.0f/DTERM_LPF_2ND_HZ) ) )*(FILTERCALC(0.001, (1.0f/DTERM_LPF_2ND_HZ) ));
-static float alpha_sqr = (1 - FILTERCALC(0.001, (1.0f/DTERM_LPF_2ND_HZ) ))*(1 - FILTERCALC(0.001, (1.0f/DTERM_LPF_2ND_HZ) ));
+static constexpr float filter_calc(float sampleperiod, float filtertime) {
+  return (1.0f - (6.0f * sampleperiod) / (3.0f * sampleperiod + filtertime));
+}
 
-static float last_out[3], last_out2[3];
+static const constexpr float two_one_minus_alpha = 2 * filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ));
+static const constexpr float one_minus_alpha_sqr = (filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ))) * (filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ)));
+static const constexpr float alpha_sqr = (1 - filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ))) * (1 - filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ)));
 
-float lpf2( float in, int num)
- {
+static vector last_out, last_out2;
 
-  float ans = in * alpha_sqr + two_one_minus_alpha * last_out[num]
-      - one_minus_alpha_sqr * last_out2[num];   
+float lpf2(float in, int axis) {
+  float ans = in * alpha_sqr + two_one_minus_alpha * last_out[axis]
+      - one_minus_alpha_sqr * last_out2[axis];   
 
-  last_out2[num] = last_out[num];
-  last_out[num] = ans;
-  
+  last_out2[axis] = last_out[axis];
+  last_out[axis] = ans;
+
   return ans;
- }
+}
 
 namespace control {
 
@@ -77,6 +77,7 @@ namespace control {
       // skip yaw D term if not set
       if (pidkd[axis] > 0) {
         dterm[axis] = -(actual[axis] - lastrate[axis]) / dt * pidkd[axis];
+        dterm[axis] = lpf2(dterm[axis], axis);
         lastrate[axis] = actual[axis];
       } else {
         dterm[axis] = 0;
