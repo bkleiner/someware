@@ -71,6 +71,22 @@ public:
     return values[2];
   }
 
+  vector operator -(const vector& rhs) const {
+    return vector{
+      values[0] - rhs[0],
+      values[1] - rhs[1],
+      values[2] - rhs[2]
+    };
+  }
+
+  vector operator *(float v) const {
+    return vector{
+      values[0] * v,
+      values[1] * v,
+      values[2] * v
+    };
+  }
+
 private:
   float values[3];
 };

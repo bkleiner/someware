@@ -26,7 +26,7 @@ namespace control {
           "CTRL DT: %5.2f, FREQ: %5.2fkHz, ARMED: %d\r\n",
           dt,
           (1000.f / dt) / 1000.f,
-          ctrl.is_armed(sbus)
+          ctrl.armed
         );
         usb.printf(
           "INPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
@@ -76,8 +76,8 @@ namespace control {
             brd->reset_to_bootloader();
             break;
           case 'A':
-            ctrl.arm_override = !ctrl.arm_override;
-            usb.printf("arm_override: %d\r\n", ctrl.arm_override ? 1 : 0);
+            ctrl.armed = !ctrl.armed;
+            usb.printf("armed: %d\r\n", ctrl.armed ? 1 : 0);
             break;
           case 'C': {
             const auto& bias = ctrl.calibrate_gyro();

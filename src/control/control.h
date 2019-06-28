@@ -24,6 +24,14 @@ namespace control
     void update(float dt, rx::rx& recv) {
       update_gyro();
 
+      if (recv.get(rx::AUX1) > 0.5f) {
+        if (!armed && recv.get(rx::THR) < -0.99f) {
+          armed = true;
+        }
+      } else {
+        armed = false;
+      }
+
       input_demands = {
         recv.get(rx::THR) * rc_rate.throttle,
         recv.get(rx::AIL) * rc_rate.roll,
@@ -35,7 +43,7 @@ namespace control
         input_demands.pitch * rate_limit_deg * (util::pi / 180.0f),
         input_demands.yaw * rate_limit_deg * (util::pi / 180.0f)
       };
-      const vector out = pid.calc(dt, rates, gyro);
+      const vector out = pid.calc(dt, is_airborn(), rates, gyro);
       output_demands = {
         input_demands.throttle,
         out.roll(),
@@ -43,7 +51,7 @@ namespace control
         out.yaw()
       };
 
-      if (is_armed(recv)) {
+      if (is_armed()) {
         mix.set_demands(output_demands);
       } else {
         disarm();
@@ -54,9 +62,13 @@ namespace control
       mix.set_all(0.0f);
     }
 
-    bool is_armed(rx::rx& recv) {
-      return arm_override || recv.get(rx::AUX1) > 0.5f;
-    };
+    bool is_armed() {
+      return armed;
+    }
+
+    bool is_airborn() {
+      return armed && input_demands.throttle > -0.2f;
+    }
 
     void update_gyro() {
       vector gyro_new = brd->accel().read_gyro();
@@ -76,7 +88,7 @@ namespace control
       return cfg.gyro_bias;
     }
 
-    bool arm_override = false;
+    bool armed = false;
     
     vector gyro = {0, 0, 0};
     

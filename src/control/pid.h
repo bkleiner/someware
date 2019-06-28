@@ -45,21 +45,17 @@ namespace control {
       lastrate = vector(0);
     }
 
-    const vector calc(float dt, const vector& rate_setpoint, const vector& rate_actual) {
-      const vector error = {
-        rate_setpoint[0] - rate_actual[0],
-        rate_setpoint[1] - rate_actual[1],
-        rate_setpoint[2] - rate_actual[2]
-      };
+    const vector calc(float dt, bool is_airborn, const vector& rate_setpoint, const vector& rate_actual) {
+      const vector error = rate_setpoint - rate_actual;
 
       return vector{
-        calc_axis(dt, 0, error, rate_actual),
-        calc_axis(dt, 1, error, rate_actual),
-        calc_axis(dt, 2, error, rate_actual)
+        calc_axis(dt, is_airborn, 0, error, rate_actual),
+        calc_axis(dt, is_airborn, 1, error, rate_actual),
+        calc_axis(dt, is_airborn, 2, error, rate_actual)
       };
     }
 
-    float calc_axis(float dt, uint8_t axis, const vector& error, const vector& actual) {
+    float calc_axis(float dt, bool is_airborn, uint8_t axis, const vector& error, const vector& actual) {
       // gyro is in deg/s so we need your timestep in s (vs us)
       const float dts = dt / 1000.f;
 
@@ -67,6 +63,12 @@ namespace control {
       pterm[axis] = error[axis] * pidkp[axis];
 
       // I term
+      if (!is_airborn) {
+        // if we are still on the ground the quad vibrates a lot etc.
+        // so iterm winds if self up. we dim it down here for easier take of.
+        iterm[axis] *= 0.98f;
+      }
+
       iterm[axis] = 
         iterm[axis] + 1/6 * 
         (lasterror2[axis] + 4 * lasterror[axis] + error[axis])
@@ -90,7 +92,7 @@ namespace control {
     };
 
     //                     ROLL       PITCH     YAW
-    const vector pidkp = {    0.14,    0.14,    0.1 };
+    const vector pidkp = {    0.15,    0.15,    0.1 };
     const vector pidki = {     1.2,     1.2,    1.0 };	
     const vector pidkd = {    0.75,    0.75,    0.5 };
 
