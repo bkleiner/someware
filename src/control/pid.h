@@ -84,7 +84,7 @@ namespace control {
       // D term
       // skip yaw D term if not set
       if (pidkd[axis] > 0) {
-        dterm[axis] = (actual[axis] - lastrate[axis]) / dt * pidkd[axis];
+        dterm[axis] = -(actual[axis] - lastrate[axis]) / dt * pidkd[axis];
         lastrate[axis] = actual[axis];
       } else {
         dterm[axis] = 0;
@@ -97,9 +97,9 @@ namespace control {
     };
 
     //                     ROLL       PITCH     YAW
-    const vector pidkp = {     0.2,     0.2,    0.1 };
-    const vector pidki = {     1.0,     1.0,    1.0 };	
-    const vector pidkd = {     0.5,     0.5,    0.5 };
+    const vector pidkp = {    0.14,    0.14,    0.1 };
+    const vector pidki = {     1.2,     1.2,    1.0 };	
+    const vector pidkd = {    0.75,    0.75,    0.5 };
 
     const vector integral_limit = { 1.7 , 1.7 , 0.5 };
 

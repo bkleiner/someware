@@ -65,11 +65,11 @@ namespace control {
   private:
     static const uint8_t motor_count = 4;
     const motor_mix motor_mixes[motor_count] = {
-      // T   A   E   R
-      { +1, -1, +1, +1 }, // 1 right rear
-      { +1, -1, -1, -1 }, // 2 right front
-      { +1, +1, +1, -1 }, // 3 left rear
-      { +1, +1, -1, +1 }  // 4 left front
+      // T   R   P   Y
+      { +1, +1, +1, +1 }, // 1 rear left
+      { +1, +1, -1, -1 }, // 2 front left
+      { +1, -1, +1, -1 }, // 3 rear right
+      { +1, -1, -1, +1 }  // 4 front  right
     };
     float motors[motor_count];
 

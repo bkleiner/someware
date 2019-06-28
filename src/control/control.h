@@ -25,15 +25,15 @@ namespace control
       update_gyro();
 
       input_demands = {
-         recv.get(rx::THR) * rc_rate.throttle,
-        -recv.get(rx::AIL) * rc_rate.roll,
-         recv.get(rx::ELE) * rc_rate.pitch,
-         recv.get(rx::RUD) * rc_rate.yaw
+        recv.get(rx::THR) * rc_rate.throttle,
+        recv.get(rx::AIL) * rc_rate.roll,
+        recv.get(rx::ELE) * rc_rate.pitch,
+        recv.get(rx::RUD) * rc_rate.yaw
       };
       const vector rates = {
-        input_demands.roll,
-        input_demands.pitch,
-        input_demands.yaw
+        input_demands.roll * rate_limit_deg * (util::pi / 180.0f),
+        input_demands.pitch * rate_limit_deg * (util::pi / 180.0f),
+        input_demands.yaw * rate_limit_deg * (util::pi / 180.0f)
       };
       const vector out = pid.calc(dt, rates, gyro);
       output_demands = {
@@ -60,9 +60,11 @@ namespace control
 
     void update_gyro() {
       vector gyro_new = brd->accel().read_gyro();
+      
+      gyro_new[vector::ROLL] = -gyro_new[vector::ROLL];
 
       for (int i = 0; i < 3; i++) {
-        gyro[i] = gyro_new[i] * (1.0f / 180.0f) * util::pi;
+        gyro[i] = gyro_new[i] * (util::pi / 180.0f);
         gyro[i] = gyro_filter.step(i, gyro[i]);
 			  gyro[i] = gyro_filter2.step(i, gyro[i]);
       }
@@ -85,12 +87,12 @@ namespace control
     config cfg;
 
   private:
-    const float rate_limit_deg = 180.f;
+    const float rate_limit_deg = 860.f;
     const demands rc_rate = {
       1.0f, // T
-      1.0f, // A
-      1.0f, // E
-      1.0f  // R
+      0.5f, // A
+      0.5f, // E
+      0.5f  // R
     };
 
     bool did_startup;
