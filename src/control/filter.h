@@ -64,7 +64,39 @@ namespace control::filter {
     vector last_estimation;
     vector last_prediction; 
     float Q, R;
-  };    
+  };
+
+
+  class biquad_lowpass {
+  public:
+    static const constexpr float butterworth = 0.7071;
+
+    biquad_lowpass(float fc, float q) 
+      : FC(fc)
+      , Q(q)
+    {
+      float K = tan(util::pi * FC);
+      float norm = 1 / (1 + K / Q + K * K);
+
+      a0 = K * K * norm;
+      a1 = 2 * a0;
+      a2 = a0;
+      b1 = 2 * (K * K - 1) * norm;
+      b2 = (1 - K / Q + K * K) * norm;
+    }
+
+    inline float step(float in) {
+      float out = in * a0 + z1;
+      z1 = in * a1 + z2 - b1 * out;
+      z2 = in * a2 - b2 * out;
+      return out;
+    }
+
+  private:
+    float FC, Q;
+    float a0, a1, a2, b1, b2;
+    float z1, z2;
+  };
 
   static float constrain_min_max(float val, float min, float max) {
     return (val < min) ? min : ((val > max) ? max : val);
