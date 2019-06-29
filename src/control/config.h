@@ -11,6 +11,7 @@ namespace control {
 
   struct config {
     vector gyro_bias;
+    vector accel_bias;
 
     vector pid_kp;
     vector pid_ki;
@@ -23,6 +24,7 @@ namespace control {
       const vector default_pid_kd = {   0.78,    0.78,   0.6 };
 
       gyro_bias = {};
+      accel_bias = {};
 
       pid_kp = default_pid_kp;
       pid_ki = default_pid_ki;

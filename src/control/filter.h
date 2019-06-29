@@ -109,5 +109,13 @@ namespace control::filter {
   static float constrain_min_max(float val, float min, float max) {
     return (val < min) ? min : ((val > max) ? max : val);
   }
+
+  static float simple_lowpass(float last, float in, float Q) {
+    return last * Q + in * (1.0f - Q); 
+  }
+
+  static vector simple_lowpass(vector last, vector in, float Q) {
+    return last * Q + in * (1.0f - Q); 
+  }
   
 }

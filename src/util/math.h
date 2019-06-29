@@ -3,6 +3,8 @@
 namespace util {
 
   static const constexpr float pi = 3.14159265358979323846;
+  static const constexpr float deg_to_rad = (pi / 180.0f);
+  static const constexpr float rad_to_deg = (180.0f / pi);
 
   template<class T>
   static T min(const T a, const T b) {

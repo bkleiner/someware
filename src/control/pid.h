@@ -122,7 +122,7 @@ namespace control::pid {
   public:
 
     const vector calc(float dt, const vector& rate_setpoint, const vector& rate_actual) {
-      const vector error = rate_setpoint - rate_actual;
+      const vector error = vector::cross(rate_setpoint, rate_actual);
 
       return vector{
         calc_axis(dt, 0, error, rate_actual),

@@ -55,6 +55,24 @@ namespace control {
             ctrl.gyro.yaw()
           );
           usb.printf(
+            "ACCEL X: %5.2f, Y: %5.2f, Z: %5.2f\r\n", 
+            ctrl.accel.roll(),
+            ctrl.accel.pitch(),
+            ctrl.accel.yaw()
+          );
+          usb.printf(
+            "ANGEL X: %5.2f, Y: %5.2f, Z: %5.2f\r\n", 
+            ctrl.angel.roll(),
+            ctrl.angel.pitch(),
+            ctrl.angel.yaw()
+          );
+          usb.printf(
+            "STICK X: %5.2f, Y: %5.2f, Z: %5.2f\r\n", 
+            ctrl.stick_vector.roll(),
+            ctrl.stick_vector.pitch(),
+            ctrl.stick_vector.yaw()
+          );
+          usb.printf(
             "PTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
             ctrl.rate_pid.pterm.roll(),
             ctrl.rate_pid.pterm.pitch(),
@@ -98,10 +116,16 @@ namespace control {
             // fallthrough
           case 'P': {
             usb.printf(
-              "CONFIG ROLL_BIAS: %5.2f, PITCH_BIAS: %5.2f, YAW_BIAS: %5.2f\r\n",
+              "CONFIG GYRO_ROLL_BIAS: %5.2f, GYRO_PITCH_BIAS: %5.2f, GYRO_YAW_BIAS: %5.2f\r\n",
               ctrl.cfg.gyro_bias.roll(),
               ctrl.cfg.gyro_bias.pitch(),
               ctrl.cfg.gyro_bias.yaw()
+            );
+            usb.printf(
+              "CONFIG ACCEL_X_BIAS: %5.2f, ACCEL_Y_BIAS: %5.2f, ACCEL_Z_BIAS: %5.2f\r\n",
+              ctrl.cfg.accel_bias.x(),
+              ctrl.cfg.accel_bias.y(),
+              ctrl.cfg.accel_bias.z()
             );
             usb.printf(
               "CONFIG ROLL_KP: %5.2f, PITCH_KP: %5.2f, YAW_KP: %5.2f\r\n",

@@ -222,36 +222,67 @@ vector mpu_6000::read_gyro() {
   );
 }
 
-buffer<int16_t> mpu_6000::read_accel() {
-  const auto& data = bus->bus_read_register_buffer(cs, MPU_RA_ACCEL_XOUT_H, 6);
-
-  buffer<int16_t> buf(3);
-  buf[0] = bytes_to_short(data[0], data[1]);
-  buf[1] = bytes_to_short(data[2], data[3]);
-  buf[2] = bytes_to_short(data[4], data[5]);
-
-  return buf;
+float tranform_accel(int16_t value) {
+  static constexpr const float factor = 16.f / 32768.f;
+  return float(value) * factor;
 }
 
-vector mpu_6000::calibrate() {
-  const uint32_t sample_time_us = 1000000; // 1 second in us
-  const int32_t max_samples = 500;
+vector mpu_6000::read_accel() {
+  const auto& data = bus->bus_read_register_buffer(cs, MPU_RA_ACCEL_XOUT_H, 6);
 
+  return vector(
+    tranform_accel(bytes_to_short(data[0], data[1])) - accel_bias[0],
+    tranform_accel(bytes_to_short(data[2], data[3])) - accel_bias[1],
+    tranform_accel(bytes_to_short(data[4], data[5])) - accel_bias[2]
+  );
+}
+
+static const constexpr uint32_t pass_time_us = 500 * 1000;
+static const constexpr int32_t max_samples = 250;
+static const constexpr int32_t max_passes = 2;
+
+vector mpu_6000::calibrate_gyro() {
   double gyro_samples[3] = {0, 0, 0};
-  for (size_t i = 0; i < max_samples; i++) {
-    const auto& data = bus->bus_read_register_buffer(cs, MPU_RA_GYRO_XOUT_H, 6);
 
-    gyro_samples[0] += tranform_gyro(bytes_to_short(data[0], data[1]));
-    gyro_samples[1] += tranform_gyro(bytes_to_short(data[2], data[3]));
-    gyro_samples[2] += tranform_gyro(bytes_to_short(data[4], data[5]));
+  for (size_t i = 0; i < max_passes; i++) {
+    platform::time::delay_ms(250);
+    for (size_t i = 0; i < max_samples; i++) {
+      const auto& data = bus->bus_read_register_buffer(cs, MPU_RA_GYRO_XOUT_H, 6);
 
-    platform::time::delay_us(max_samples / sample_time_us);
+      gyro_samples[0] += tranform_gyro(bytes_to_short(data[0], data[1]));
+      gyro_samples[1] += tranform_gyro(bytes_to_short(data[2], data[3]));
+      gyro_samples[2] += tranform_gyro(bytes_to_short(data[4], data[5]));
+      platform::time::delay_us(max_samples / pass_time_us);
+    }
   }
 
-  gyro_bias[0] = gyro_samples[0] / double(max_samples);
-  gyro_bias[1] = gyro_samples[1] / double(max_samples);
-  gyro_bias[2] = gyro_samples[2] / double(max_samples);
+  gyro_bias[0] = gyro_samples[0] / double(max_passes * max_samples);
+  gyro_bias[1] = gyro_samples[1] / double(max_passes * max_samples);
+  gyro_bias[2] = gyro_samples[2] / double(max_passes * max_samples);
 
-  return gyro_bias;
+  return accel_bias;
+}
+
+vector mpu_6000::calibrate_accel() {
+  double accel_samples[3] = {0, 0, 0};
+
+  for (size_t i = 0; i < max_passes; i++) {
+    platform::time::delay_ms(250);
+    for (size_t i = 0; i < max_samples; i++) {
+      const auto& data = bus->bus_read_register_buffer(cs, MPU_RA_ACCEL_XOUT_H, 6);
+
+      accel_samples[0] += tranform_accel(bytes_to_short(data[0], data[1]));
+      accel_samples[1] += tranform_accel(bytes_to_short(data[2], data[3]));
+      accel_samples[2] += tranform_accel(bytes_to_short(data[4], data[5]));
+
+      platform::time::delay_us(max_samples / pass_time_us);
+    }
+  }
+
+  accel_bias[0] = accel_samples[0] / double(max_passes * max_samples);
+  accel_bias[1] = accel_samples[1] / double(max_passes * max_samples);
+  accel_bias[2] = accel_samples[2] / double(max_passes * max_samples) + 1.0f;
+
+  return accel_bias;
 }
 }

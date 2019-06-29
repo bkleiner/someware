@@ -7,13 +7,15 @@ namespace accel {
 
   class accel {
   public:
-    virtual vector calibrate() = 0;
+    virtual vector calibrate_gyro() = 0;
+    virtual vector calibrate_accel() = 0;
     
     virtual float read_temparture() = 0;
     virtual vector read_gyro() = 0;
-    virtual buffer<int16_t> read_accel() = 0;
+    virtual vector read_accel() = 0;
 
-    virtual void set_bias(const vector&) = 0;
+    virtual void set_gyro_bias(const vector&) = 0;
+    virtual void set_accel_bias(const vector&) = 0;
   };
 
 }

@@ -9,20 +9,27 @@ namespace accel {
   public:
     mpu_6000(spi* bus, gpio::pin* cs);
 
-    vector calibrate() override;
+    vector calibrate_gyro() override;
+    vector calibrate_accel() override;
 
     float read_temparture() override;
     vector read_gyro() override;
-    buffer<int16_t> read_accel() override;
+    vector read_accel() override;
 
-    void set_bias(const vector& bias) {
+    void set_gyro_bias(const vector& bias) {
       gyro_bias = bias;
+    }
+
+    void set_accel_bias(const vector& bias) {
+      accel_bias = bias;
     }
 
   private:
     spi* bus;
     gpio::pin* cs;
+    
     vector gyro_bias;
+    vector accel_bias;
   };
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math.h>
+
 class vector {
 public:
   enum AXIS {
@@ -58,6 +60,30 @@ public:
     return values[2];
   }
 
+  float length() const {
+    return sqrt(x() * x() + y() * y() + z() * z());
+  }
+
+  static vector normalize(const vector& v) {
+    const auto len = v.length();
+    if (len == 0) {
+      return {0, 0, 0};
+    }
+    return vector{
+      v[0] / len,
+      v[1] / len,
+      v[2] / len
+    };
+  }
+
+  static vector cross(const vector& v0, const vector& v1) {
+    return vector{
+      v0[1] * v1[2] - v0[2] * v1[1],
+      v0[0] * v1[2] - v0[2] * v1[0],
+      v0[0] * v1[1] - v0[1] * v1[0] 
+    };
+  }
+
   vector operator -(const vector& rhs) const {
     return vector{
       values[0] - rhs[0],
@@ -66,11 +92,27 @@ public:
     };
   }
 
+  vector operator +(const vector& rhs) const {
+    return vector{
+      values[0] + rhs[0],
+      values[1] + rhs[1],
+      values[2] + rhs[2]
+    };
+  }
+
   vector operator *(float v) const {
     return vector{
       values[0] * v,
       values[1] * v,
       values[2] * v
+    };
+  }
+
+  vector operator *(const vector& v) const {
+    return vector{
+      values[0] * v[0],
+      values[1] * v[1],
+      values[2] * v[2]
     };
   }
 
