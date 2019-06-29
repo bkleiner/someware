@@ -60,6 +60,7 @@ private:
   sbus_states state = IDLE;
   buffer<uint8_t> frame;
   uint8_t frame_length = 0;
+  uint32_t frame_start_us = 0;
 };
 
 }

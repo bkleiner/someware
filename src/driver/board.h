@@ -16,9 +16,10 @@ namespace motor
   };
 }
 
-
 class board {
 public:
+  board();
+
   virtual bool usb_serial_active() = 0;
   virtual serial& usb_serial() = 0;
 

@@ -1,5 +1,7 @@
 #include "sbus.h"
 
+#include "platform/time.h"
+
 namespace rx {
 
 bool sbus::feed(uint8_t v) {
@@ -12,6 +14,7 @@ bool sbus::feed(uint8_t v) {
       frame[frame_length++] = v;
 
       state = START;
+      frame_start_us = platform::time::now_us();
     }
     return false;
   case START:

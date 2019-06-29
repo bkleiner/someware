@@ -14,7 +14,7 @@ namespace control {
     {}
 
     void update(float dt, rx::rx& sbus, control& ctrl) {
-      auto time = int64_t(brd->millis());
+      auto time = platform::time::now_ms();
       auto& usb = brd->usb_serial();
 
       if (dump_ctrl) {
