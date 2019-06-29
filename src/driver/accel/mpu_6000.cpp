@@ -234,6 +234,7 @@ buffer<int16_t> mpu_6000::read_accel() {
 }
 
 vector mpu_6000::calibrate() {
+  const uint32_t sample_time_us = 1000000; // 1 second in us
   const int32_t max_samples = 500;
 
   double gyro_samples[3] = {0, 0, 0};
@@ -244,7 +245,7 @@ vector mpu_6000::calibrate() {
     gyro_samples[1] += tranform_gyro(bytes_to_short(data[2], data[3]));
     gyro_samples[2] += tranform_gyro(bytes_to_short(data[4], data[5]));
 
-    platform::time::delay_ms(2);
+    platform::time::delay_us(max_samples / sample_time_us);
   }
 
   gyro_bias[0] = gyro_samples[0] / double(max_samples);

@@ -8,7 +8,6 @@
 #include "rx/rx.h"
 #include "util/timer.h"
 #include "driver/board.h"
-#include "platform/time.h"
 
 namespace control
 {

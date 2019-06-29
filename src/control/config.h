@@ -18,9 +18,9 @@ namespace control {
 
     void reset() {
       //                               ROLL   PITCH    YAW
-      const vector default_pid_kp = {  0.17,   0.17,  0.14 };
-      const vector default_pid_ki = {  1.06,   1.06,  1.02 };	
-      const vector default_pid_kd = {  0.78,   0.78,   0.6 };
+      const vector default_pid_kp = {  0.21,   0.21,  0.14 };
+      const vector default_pid_ki = {  1.09,   1.09,  1.02 };	
+      const vector default_pid_kd = {  0.75,   0.75,   0.6 };
 
       gyro_bias = {};
 
