@@ -27,7 +27,6 @@ namespace control {
     }
 
     void modify_value(rx::rx& recv, float* value, rx::channels input, uint8_t axis) {
-
       if (recv.get(input) > active_threshold) {
         if (!axis_active[axis])
           *value += 0.01f;

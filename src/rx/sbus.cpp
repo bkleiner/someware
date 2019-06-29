@@ -1,6 +1,7 @@
 #include "sbus.h"
 
 #include "platform/time.h"
+#include "platform/print.h"
 
 namespace rx {
 
@@ -25,6 +26,7 @@ bool sbus::feed(uint8_t v) {
     state = DONE;
     return true;
   case DONE:
+    platform::print("sbus frame delayed.");
     return true;
   }
   
