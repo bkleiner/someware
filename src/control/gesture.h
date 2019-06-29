@@ -6,7 +6,7 @@
 namespace control {
   
   struct gesture_controller {
-    void update(float dt, rx::rx& recv, config& cfg) {
+    bool update(float dt, rx::rx& recv, config& cfg) {
       vector* term = nullptr;
 
       if (recv.get(rx::AUX2) < -0.5) {
@@ -21,7 +21,9 @@ namespace control {
         modify_value(recv, &(*term)[vector::ROLL], rx::ELE, vector::ROLL);
         modify_value(recv, &(*term)[vector::PITCH], rx::ELE, vector::PITCH);
         //modify_value(recv, &(*term)[vector::YAW], rx::AIL, vector::YAW);
+        return true;
       }
+      return false;
     }
 
     void modify_value(rx::rx& recv, float* value, rx::channels input, uint8_t axis) {

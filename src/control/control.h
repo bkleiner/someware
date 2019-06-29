@@ -27,12 +27,17 @@ namespace control
 
       if (recv.get(rx::AUX1) > 0.5f) {
         if (!armed && recv.get(rx::THR) < -0.99f) {
-          cfg.save(brd->flash());
+          if (config_dirty) {
+            cfg.save(brd->flash());
+            config_dirty = false;
+          }
           rate_pid.reset();
           armed = true;
         }
       } else {
-        gesture.update(dt, recv, cfg);
+        if (gesture.update(dt, recv, cfg)) {
+          config_dirty = true;
+        }
         armed = false;
       }
 
@@ -106,6 +111,7 @@ namespace control
     gesture_controller gesture;
 
   private:
+    bool config_dirty = false;
     const float rate_limit_deg = 860.f;
     const demands rc_rate = {
       1.0f, // T
