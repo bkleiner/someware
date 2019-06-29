@@ -24,19 +24,6 @@ public:
     values[2] = z;
   }
 
-  vector(const vector& other)
-    : vector(other.x(), other.y(), other.z())
-  {}
-
-  vector& operator=(const vector& other) {
-    if (this != &other) {
-      values[0] = other.values[0];
-      values[1] = other.values[1];
-      values[2] = other.values[2];
-    }
-    return *this;
-  }
-
   float& operator[](int index) {
     return values[index];
   }

@@ -125,6 +125,10 @@ func readSerial() {
 
 		switch m.Dataset {
 		case "PTERM", "ITERM", "DTERM", "GYRO":
+			if (len(datasets[m.Dataset]) > 100) {
+				datasets[m.Dataset] = datasets[m.Dataset][:1]
+			}
+
 			datasets[m.Dataset] = append(datasets[m.Dataset], Vector{
 				mustParseFloat(m.Payload["ROLL"]),
 				mustParseFloat(m.Payload["PITCH"]),

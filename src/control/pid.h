@@ -37,6 +37,10 @@ namespace control::pid {
 
   class rate_controller {
   public:
+    rate_controller(const config* cfg)
+      : cfg(cfg)
+    {}
+
     void reset() {
       pterm = vector(0);
       iterm = vector(0);
@@ -62,7 +66,7 @@ namespace control::pid {
       const float dts = dt / 1000.f;
 
       // P Term 
-      pterm[axis] = error[axis] * pidkp[axis];
+      pterm[axis] = error[axis] * cfg->pid_kp[axis];
 
       // I term
       if (!is_airborn) {
@@ -74,13 +78,13 @@ namespace control::pid {
       iterm[axis] = 
         iterm[axis] + 1/6 * 
         (lasterror2[axis] + 4 * lasterror[axis] + error[axis])
-        * pidki[axis] * dts;
+        * cfg->pid_ki[axis] * dts;
       iterm[axis] = filter::constrain_min_max(iterm[axis], -integral_limit[axis], integral_limit[axis]);
 
       // D term
       // skip yaw D term if not set
-      if (pidkd[axis] > 0) {
-        dterm[axis] = -(actual[axis] - lastrate[axis]) / dt * pidkd[axis];
+      if (cfg->pid_kd[axis] > 0) {
+        dterm[axis] = -(actual[axis] - lastrate[axis]) / dt * cfg->pid_kd[axis];
         dterm[axis] = lpf2(dterm[axis], axis);
         // dterm[axis] = gyro_filter[axis].step(dterm[axis]);
         lastrate[axis] = actual[axis];
@@ -94,19 +98,15 @@ namespace control::pid {
       return pterm[axis] + iterm[axis] + dterm[axis];
     };
 
-    //                     ROLL       PITCH     YAW
-    const vector pidkp = {    0.15,    0.15,    0.1 };
-    const vector pidki = {     1.2,     1.2,    1.0 };	
-    const vector pidkd = {    0.75,    0.75,    0.5 };
-
-    const vector integral_limit = { 1.7 , 1.7 , 0.5 };
 
     vector iterm;
     vector pterm;
     vector dterm;
 
   private:
-    filter::biquad_lowpass gyro_filter[3] = {
+    const config* cfg = nullptr;
+    const vector integral_limit = { 1.7 , 1.7 , 0.5 };
+    const filter::biquad_lowpass gyro_filter[3] = {
       {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
       {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
       {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},

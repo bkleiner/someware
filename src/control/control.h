@@ -16,8 +16,9 @@ namespace control
       : did_startup(false)
       , brd(brd)
       , mix(brd)
+      , cfg(*((config*)brd->flash().pointer()))
+      , rate_pid(&cfg)
     {
-      cfg = *((config*)brd->flash().pointer());
       brd->accel().set_bias(cfg.gyro_bias);
     }
 
@@ -26,6 +27,7 @@ namespace control
 
       if (recv.get(rx::AUX1) > 0.5f) {
         if (!armed && recv.get(rx::THR) < -0.99f) {
+          rate_pid.reset();
           armed = true;
         }
       } else {
@@ -67,7 +69,7 @@ namespace control
     }
 
     bool is_airborn() {
-      return armed && output_demands.throttle > 0.2f;
+      return armed && output_demands.throttle > -0.2f;
     }
 
     void update_gyro() {
@@ -83,6 +85,7 @@ namespace control
     }
 
     vector calibrate_gyro() {
+      cfg.reset();
       cfg.gyro_bias = brd->accel().calibrate();
       cfg.save(brd->flash());
       return cfg.gyro_bias;
@@ -95,8 +98,8 @@ namespace control
     demands input_demands = {0, 0, 0, 0};
     demands output_demands = {0, 0, 0, 0};
 
-    pid::rate_controller rate_pid;
     config cfg;
+    pid::rate_controller rate_pid;
 
   private:
     const float rate_limit_deg = 860.f;

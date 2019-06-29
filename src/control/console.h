@@ -23,10 +23,11 @@ namespace control {
             sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)
           );
         usb.printf(
-          "CTRL DT: %5.2f, FREQ: %5.2fkHz, ARMED: %d\r\n",
+          "CTRL DT: %5.2f, FREQ: %5.2fkHz, ARMED: %d, AIRBORN: %d\r\n",
           dt,
           (1000.f / dt) / 1000.f,
-          ctrl.armed
+          ctrl.armed,
+          ctrl.is_airborn()
         );
         usb.printf(
           "INPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
@@ -79,13 +80,33 @@ namespace control {
             ctrl.armed = !ctrl.armed;
             usb.printf("armed: %d\r\n", ctrl.armed ? 1 : 0);
             break;
-          case 'C': {
-            const auto& bias = ctrl.calibrate_gyro();
+          case 'C':
+            ctrl.calibrate_gyro();
+            // fallthrough
+          case 'P': {
             usb.printf(
-              "gyro_bias: %5.2f %5.2f %5.2f\r\n",
-              bias[0],
-              bias[1],
-              bias[2]
+              "CONFIG ROLL_BIAS: %5.2f, PITCH_BIAS: %5.2f, YAW_BIAS: %5.2f\r\n",
+              ctrl.cfg.gyro_bias.roll(),
+              ctrl.cfg.gyro_bias.pitch(),
+              ctrl.cfg.gyro_bias.yaw()
+            );
+            usb.printf(
+              "CONFIG ROLL_KP: %5.2f, PITCH_KP: %5.2f, YAW_KP: %5.2f\r\n",
+              ctrl.cfg.pid_kp.roll(),
+              ctrl.cfg.pid_kp.pitch(),
+              ctrl.cfg.pid_kp.yaw()
+            );
+            usb.printf(
+              "CONFIG ROLL_KI: %5.2f, PITCH_KI: %5.2f, YAW_KI: %5.2f\r\n",
+              ctrl.cfg.pid_ki.roll(),
+              ctrl.cfg.pid_ki.pitch(),
+              ctrl.cfg.pid_ki.yaw()
+            );
+            usb.printf(
+              "CONFIG ROLL_KD: %5.2f, PITCH_KD: %5.2f, YAW_KD: %5.2f\r\n",
+              ctrl.cfg.pid_kd.roll(),
+              ctrl.cfg.pid_kd.pitch(),
+              ctrl.cfg.pid_kd.yaw()
             );
             break;
           }
