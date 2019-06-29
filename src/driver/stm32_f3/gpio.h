@@ -137,17 +137,17 @@ namespace stm32_f3::gpio {
 
     void low() override {
       if (invert) {
-        GPIO_ResetBits(port::get(), port::value());
-      } else  {
         GPIO_SetBits(port::get(), port::value());
+      } else  {
+        GPIO_ResetBits(port::get(), port::value());
       }
     }
 
     void high() override {
       if (invert) {
-        GPIO_SetBits(port::get(), port::value());
-      } else  {
         GPIO_ResetBits(port::get(), port::value());
+      } else  {
+        GPIO_SetBits(port::get(), port::value());
       }
     }
 

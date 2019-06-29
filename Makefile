@@ -40,7 +40,7 @@ TARGET_DEPS   = $(addsuffix .d,$(addprefix $(BUILD_DIR)/,$(basename $(TARGET_SOU
 TEST_FILES  = $(shell find test -name '*.cpp')
 TEST_BINS   = $(patsubst test/%.cpp,$(BUILD_DIR)/test/%,$(TEST_FILES))
 
-OPTIMIZE = -O2 -Wall
+OPTIMIZE = -O2 -Wall -Wextra
 CFLAGS   = -MMD -MP $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
 CXXFLAGS = -MMD -MP -fno-rtti -std=c++17 $(OPTIMIZE) $(ARCH_FLAGS) $(DEVICE_FLAGS)
 HOST_CXXFLAGS = -fno-rtti -std=c++17 $(OPTIMIZE) $(DEVICE_FLAGS)

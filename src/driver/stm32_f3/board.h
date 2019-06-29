@@ -35,7 +35,6 @@ namespace stm32_f3 {
     void reset_to_bootloader() override;
 
   private:
-    uint64_t last_cycles = 0;
     flash_memory _flash;
     rc_controller rcc;
     serial_vcp vcp;

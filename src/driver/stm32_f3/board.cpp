@@ -23,7 +23,6 @@ rc_controller::rc_controller() {
 board::board() 
   : rcc()
   , vcp()
-  , last_cycles(0)
 {
   if (!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;

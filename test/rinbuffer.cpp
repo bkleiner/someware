@@ -4,7 +4,7 @@
 
 #define BUFFER_SIZE 32
 
-int main(int argc, char const *argv[]) {
+int main() {
   ring_buffer<char> buf(BUFFER_SIZE);
   
   for (size_t i = 0; i < BUFFER_SIZE; i++) {

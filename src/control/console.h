@@ -5,6 +5,9 @@
 #include "rx/rx.h"
 #include "driver/board.h"
 
+#include "platform/time.h"
+#include "platform/print.h"
+
 namespace control {
 
   class console {
@@ -17,8 +20,10 @@ namespace control {
       auto time = platform::time::now_ms();
       auto& usb = brd->usb_serial();
 
+
       if (dump_ctrl) {
         util::trigger_every<250>(time, [&] () {
+        platform::print("test");
           usb.printf(
             "THR: %5.2f, AIL: %5.2f, ELE: %5.2f, RUD: %5.2f, AUX1: %5.2f, AUX2: %5.2f\r\n",
             sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)

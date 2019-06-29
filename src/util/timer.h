@@ -1,6 +1,7 @@
 #pragma once
 
 #include "driver/board.h"
+#include "platform/time.h"
 
 namespace util {
   struct timer {

@@ -28,7 +28,7 @@ namespace control {
 
     void set_all(float v) {
       for (uint8_t i = 0; i < motor_count; i++)      
-        brd->motor(motor::motors(i)).set(0.f);
+        brd->motor(motor::motors(i)).set(v);
     }
 
     void set_demands(demands d) {

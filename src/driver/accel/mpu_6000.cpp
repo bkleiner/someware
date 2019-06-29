@@ -166,39 +166,39 @@ mpu_6000::mpu_6000(spi* bus, gpio::pin* cs)
 
   // Clock Source PPL with Z axis gyro reference
   bus->bus_write_register(cs, MPU_RA_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
-  platform::time::delay_ms(10);
+  platform::time::delay_us(15);
 
   // Disable Primary I2C Interface
   bus->bus_write_register(cs, MPU_RA_USER_CTRL, BIT_I2C_IF_DIS);
-  platform::time::delay_ms(10);
+  platform::time::delay_us(15);
 
   bus->bus_write_register(cs, MPU_RA_PWR_MGMT_2, 0x00);
-  platform::time::delay_ms(10);
+  platform::time::delay_us(15);
 
   // Accel Sample Rate 1kHz
   // Gyroscope Output Rate =  1kHz when the DLPF is enabled
   bus->bus_write_register(cs, MPU_RA_SMPLRT_DIV, 0x00);
-  platform::time::delay_ms(10);
+  platform::time::delay_us(15);
 
   bus->bus_write_register(cs, MPU6000_CONFIG, BITS_DLPF_CFG_256HZ);
-  platform::time::delay_ms(10);
+  platform::time::delay_us(15);
 
   // Gyro +/- 2000 DPS Full Scale
   bus->bus_write_register(cs, MPU_RA_GYRO_CONFIG, BITS_FS_2000DPS);
-  platform::time::delay_ms(10);
+  platform::time::delay_us(15);
 
   // Accel +/- 16 G Full Scale
   bus->bus_write_register(cs, MPU_RA_ACCEL_CONFIG, BITS_FS_16G);
-  platform::time::delay_ms(10);
+  platform::time::delay_us(15);
 
   bus->bus_write_register(cs, MPU_RA_INT_ENABLE, 0x00);
-  platform::time::delay_ms(10);
+  platform::time::delay_us(15);
 
   // bus->bus_write_register(cs, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
-  // platform::time::delay_ms(10);
+  // platform::time::delay_us(15);
 
   bus->set_divisor(spi::SPI_CLOCK_FAST);
-  platform::time::delay_ms(100);
+  platform::time::delay_us(1);
 }
 
 float mpu_6000::read_temparture() {
