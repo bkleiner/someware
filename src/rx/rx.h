@@ -28,10 +28,8 @@ namespace rx {
     }
 
     float get(channels chan) {
-      if (chan < 4) {
-        return util::map(channel_data[chan], rc_ranges[chan][0], rc_ranges[chan][1], -1, 1);
-      }
-      return util::map(channel_data[chan], 0, 2000, -1, 1);
+      const auto v = get_raw(chan);
+      return (v - rc_midpoint) / 1000.f;
     }
 
     uint32_t get_raw(channels chan) {
@@ -44,6 +42,7 @@ namespace rx {
   private:
     uint32_t low, high;
     buffer<uint32_t> channel_data;
+    const float rc_midpoint = 993;
     const float rc_ranges[4][2] = {
       {172, 1815},
       {182, 1815},

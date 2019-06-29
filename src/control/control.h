@@ -26,7 +26,7 @@ namespace control
       update_gyro();
 
       if (recv.get(rx::AUX1) > 0.5f) {
-        if (!armed && recv.get(rx::THR) < -0.99f) {
+        if (!armed && recv.get(rx::THR) < -0.8f) {
           if (config_dirty) {
             cfg.save(brd->flash());
             config_dirty = false;
