@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdint>
 
+#include "config.h"
 #include "filter.h"
 
 #include "util/vector.h"
@@ -81,6 +82,7 @@ namespace control::pid {
       if (pidkd[axis] > 0) {
         dterm[axis] = -(actual[axis] - lastrate[axis]) / dt * pidkd[axis];
         dterm[axis] = lpf2(dterm[axis], axis);
+        // dterm[axis] = gyro_filter[axis].step(dterm[axis]);
         lastrate[axis] = actual[axis];
       } else {
         dterm[axis] = 0;
@@ -104,6 +106,12 @@ namespace control::pid {
     vector dterm;
 
   private:
+    filter::biquad_lowpass gyro_filter[3] = {
+      {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
+      {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
+      {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
+    };
+
     vector lasterror;
     vector lasterror2;
 

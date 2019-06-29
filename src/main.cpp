@@ -5,9 +5,6 @@
 
 #include "rx/sbus.h"
 
-#define LOOP_FREQ_HZ 2000
-#define LOOP_TIME (1000000 / LOOP_FREQ_HZ)
-
 int main() {
   stm32_f3::betaflight_f3 board;
 

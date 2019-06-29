@@ -4,6 +4,9 @@
 
 #include "util/util.h"
 
+#define LOOP_FREQ_HZ 2000
+#define LOOP_TIME (1000000 / LOOP_FREQ_HZ)
+
 namespace control {
 
   struct config {

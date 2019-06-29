@@ -17,7 +17,7 @@ namespace control {
       auto time = int64_t(brd->millis());
       auto& usb = brd->usb_serial();
 
-      if ((time % 500) == 0 && dump_ctrl) {
+      if ((time % 250) == 0 && dump_ctrl) {
         usb.printf(
             "THR: %5.2f, AIL: %5.2f, ELE: %5.2f, RUD: %5.2f, AUX1: %5.2f, AUX2: %5.2f\r\n",
             sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)

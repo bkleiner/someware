@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math.h"
+
 #include "util/vector.h"
 
 #define	HZ_10	0.004078
@@ -71,9 +73,15 @@ namespace control::filter {
   public:
     static const constexpr float butterworth = 0.7071;
 
+    biquad_lowpass(float cutoff, float sample_rate, float q)
+      : biquad_lowpass(cutoff / sample_rate, q)
+    {}
+
     biquad_lowpass(float fc, float q) 
       : FC(fc)
       , Q(q)
+      , z1(0)
+      , z2(0)
     {
       float K = tan(util::pi * FC);
       float norm = 1 / (1 + K / Q + K * K);

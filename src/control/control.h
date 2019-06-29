@@ -33,10 +33,10 @@ namespace control
       }
 
       input_demands = {
-        recv.get(rx::THR) * rc_rate.throttle,
-        recv.get(rx::AIL) * rc_rate.roll,
-        recv.get(rx::ELE) * rc_rate.pitch,
-        recv.get(rx::RUD) * rc_rate.yaw
+        rc_filter[0].step(recv.get(rx::THR)) * rc_rate.throttle,
+        rc_filter[3].step(recv.get(rx::AIL)) * rc_rate.roll,
+        rc_filter[2].step(recv.get(rx::ELE)) * rc_rate.pitch,
+        rc_filter[1].step(recv.get(rx::RUD)) * rc_rate.yaw
       };
       const vector rates = {
         input_demands.roll * rate_limit_deg * (util::pi / 180.0f),
@@ -67,7 +67,7 @@ namespace control
     }
 
     bool is_airborn() {
-      return armed && input_demands.throttle > -0.2f;
+      return armed && output_demands.throttle > 0.2f;
     }
 
     void update_gyro() {
@@ -114,5 +114,12 @@ namespace control
     
     filter::kalman gyro_filter;
     filter::kalman gyro_filter2;
+
+    filter::biquad_lowpass rc_filter[4] = {
+      { 90, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
+      { 90, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
+      { 90, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
+      { 90, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
+    };
   };
 }
