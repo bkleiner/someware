@@ -100,10 +100,18 @@ namespace stm32_f3::gpio {
     modes::no_pull
   >;
 
+  using mode_output_pp = gpio::mode<
+    gpio::modes::output,
+    gpio::modes::push_pull,
+    gpio::modes::speed_50MHz,
+    gpio::modes::no_pull
+  >;
+
   template <
     typename port,
     typename mode,
-    uint8_t af = 0
+    uint8_t af = 0,
+    bool invert = false
   >
   struct pin : public ::gpio::pin {
 
@@ -121,14 +129,33 @@ namespace stm32_f3::gpio {
       gpio_init.GPIO_Speed = GPIOSpeed_TypeDef(mode::get(2));
       gpio_init.GPIO_PuPd = GPIOPuPd_TypeDef(mode::get(3));
       GPIO_Init(port::get(), &gpio_init);
+
+      if (invert) {
+        GPIO_SetBits(port::get(), port::value());
+      }
     }
 
     void low() override {
-      GPIO_ResetBits(port::get(), port::value());
+      if (invert) {
+        GPIO_ResetBits(port::get(), port::value());
+      } else  {
+        GPIO_SetBits(port::get(), port::value());
+      }
     }
 
     void high() override {
-      GPIO_SetBits(port::get(), port::value());
-    }    
+      if (invert) {
+        GPIO_SetBits(port::get(), port::value());
+      } else  {
+        GPIO_ResetBits(port::get(), port::value());
+      }
+    }
+
+    bool state() override {
+      if (invert) {
+        return !GPIO_ReadOutputDataBit(port::get(), port::value());
+      }
+      return GPIO_ReadOutputDataBit(port::get(), port::value());
+    }
   };
 }

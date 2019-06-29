@@ -17,56 +17,58 @@ namespace control {
       auto time = int64_t(brd->millis());
       auto& usb = brd->usb_serial();
 
-      if ((time % 250) == 0 && dump_ctrl) {
-        usb.printf(
+      if (dump_ctrl) {
+        util::trigger_every<250>(time, [&] () {
+          usb.printf(
             "THR: %5.2f, AIL: %5.2f, ELE: %5.2f, RUD: %5.2f, AUX1: %5.2f, AUX2: %5.2f\r\n",
             sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)
           );
-        usb.printf(
-          "CTRL DT: %5.2f, FREQ: %5.2fkHz, ARMED: %d, AIRBORN: %d\r\n",
-          dt,
-          (1000.f / dt) / 1000.f,
-          ctrl.armed,
-          ctrl.is_airborn()
-        );
-        usb.printf(
-          "INPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
-          ctrl.input_demands.throttle,
-          ctrl.input_demands.roll,
-          ctrl.input_demands.pitch,
-          ctrl.input_demands.yaw
-        );
-        usb.printf(
-          "GYRO ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
-          ctrl.gyro.roll(),
-          ctrl.gyro.pitch(),
-          ctrl.gyro.yaw()
-        );
-        usb.printf(
-          "PTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
-          ctrl.rate_pid.pterm.roll(),
-          ctrl.rate_pid.pterm.pitch(),
-          ctrl.rate_pid.pterm.yaw()
-        );
-        usb.printf(
-          "ITERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
-          ctrl.rate_pid.iterm.roll(),
-          ctrl.rate_pid.iterm.pitch(),
-          ctrl.rate_pid.iterm.yaw()
-        );
-        usb.printf(
-          "DTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
-          ctrl.rate_pid.dterm.roll(),
-          ctrl.rate_pid.dterm.pitch(),
-          ctrl.rate_pid.dterm.yaw()
-        );
-        usb.printf(
-          "OUTPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
-          ctrl.output_demands.throttle,
-          ctrl.output_demands.roll,
-          ctrl.output_demands.pitch,
-          ctrl.output_demands.yaw
-        );
+          usb.printf(
+            "CTRL DT: %5.2f, FREQ: %5.2fkHz, ARMED: %d, AIRBORN: %d\r\n",
+            dt,
+            (1000.f / dt) / 1000.f,
+            ctrl.armed,
+            ctrl.is_airborn()
+          );
+          usb.printf(
+            "INPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
+            ctrl.input_demands.throttle,
+            ctrl.input_demands.roll,
+            ctrl.input_demands.pitch,
+            ctrl.input_demands.yaw
+          );
+          usb.printf(
+            "GYRO ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
+            ctrl.gyro.roll(),
+            ctrl.gyro.pitch(),
+            ctrl.gyro.yaw()
+          );
+          usb.printf(
+            "PTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
+            ctrl.rate_pid.pterm.roll(),
+            ctrl.rate_pid.pterm.pitch(),
+            ctrl.rate_pid.pterm.yaw()
+          );
+          usb.printf(
+            "ITERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
+            ctrl.rate_pid.iterm.roll(),
+            ctrl.rate_pid.iterm.pitch(),
+            ctrl.rate_pid.iterm.yaw()
+          );
+          usb.printf(
+            "DTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
+            ctrl.rate_pid.dterm.roll(),
+            ctrl.rate_pid.dterm.pitch(),
+            ctrl.rate_pid.dterm.yaw()
+          );
+          usb.printf(
+            "OUTPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
+            ctrl.output_demands.throttle,
+            ctrl.output_demands.roll,
+            ctrl.output_demands.pitch,
+            ctrl.output_demands.yaw
+          );
+        });
       }
 
       {

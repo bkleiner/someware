@@ -26,13 +26,23 @@ namespace stm32_f3 {
 
     gpio::pin<
       gpio::port<gpio::A, 15>,
-      spi::mode_cs_pin
+      gpio::mode_output_pp
     > mpu_cs_pin;
 
     accel::mpu_6000 mpu;
 
     accel::accel& accel() override {
       return mpu;
+    }
+    
+    gpio::pin<
+      gpio::port<gpio::C, 15>,
+      gpio::mode_output_pp,
+      true
+    > led_pin;
+
+    ::gpio::pin& led() {
+      return led_pin;
     }
 
     pwm<
@@ -74,6 +84,7 @@ namespace stm32_f3 {
       case motor::MOTOR3:
         return motor3;
       }
+      return motor0;
     }
 
     using UART1_TX_PORT = gpio::port<gpio::A, 9>;

@@ -14,11 +14,10 @@ namespace control
   class control {
   public:
     control(board* brd)
-      : did_startup(false)
-      , brd(brd)
-      , mix(brd)
+      : brd(brd)
       , cfg(*((config*)brd->flash().pointer()))
       , rate_pid(&cfg)
+      , mix(brd)
     {
       brd->accel().set_bias(cfg.gyro_bias);
     }
@@ -101,6 +100,7 @@ namespace control
     demands input_demands = {0, 0, 0, 0};
     demands output_demands = {0, 0, 0, 0};
 
+    board* brd;
     config cfg;
     pid::rate_controller rate_pid;
     gesture_controller gesture;
@@ -113,10 +113,8 @@ namespace control
       0.5f, // E
       0.5f  // R
     };
-
-    bool did_startup;
     
-    board* brd;
+    
     mixer mix;
     
     filter::kalman gyro_filter;
