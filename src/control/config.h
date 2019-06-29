@@ -9,8 +9,6 @@
 
 namespace control {
 
-  
-
   struct config {
     vector gyro_bias;
 
@@ -19,10 +17,10 @@ namespace control {
     vector pid_kd;
 
     void reset() {
-      //                     ROLL       PITCH     YAW
-      const vector default_pid_kp = {    0.14,    0.14,    0.1 };
-      const vector default_pid_ki = {     1.4,     1.4,    1.0 };	
-      const vector default_pid_kd = {    0.73,    0.73,    0.5 };
+      //                               ROLL   PITCH    YAW
+      const vector default_pid_kp = {  0.17,   0.17,  0.14 };
+      const vector default_pid_ki = {  1.06,   1.06,  1.02 };	
+      const vector default_pid_kd = {  0.78,   0.78,   0.6 };
 
       gyro_bias = {};
 

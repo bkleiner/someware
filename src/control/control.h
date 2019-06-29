@@ -3,6 +3,7 @@
 #include "mixer.h"
 #include "pid.h"
 #include "config.h"
+#include "gesture.h"
 
 #include "rx/rx.h"
 #include "util/timer.h"
@@ -27,10 +28,12 @@ namespace control
 
       if (recv.get(rx::AUX1) > 0.5f) {
         if (!armed && recv.get(rx::THR) < -0.99f) {
+          cfg.save(brd->flash());
           rate_pid.reset();
           armed = true;
         }
       } else {
+        gesture.update(dt, recv, cfg);
         armed = false;
       }
 
@@ -100,6 +103,7 @@ namespace control
 
     config cfg;
     pid::rate_controller rate_pid;
+    gesture_controller gesture;
 
   private:
     const float rate_limit_deg = 860.f;
