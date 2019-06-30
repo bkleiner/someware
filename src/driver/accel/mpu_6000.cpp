@@ -260,7 +260,7 @@ vector mpu_6000::calibrate_gyro() {
   gyro_bias[1] = gyro_samples[1] / double(max_passes * max_samples);
   gyro_bias[2] = gyro_samples[2] / double(max_passes * max_samples);
 
-  return accel_bias;
+  return gyro_bias;
 }
 
 vector mpu_6000::calibrate_accel() {
