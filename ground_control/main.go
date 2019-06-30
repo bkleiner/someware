@@ -131,7 +131,7 @@ func readSerial() {
 		log.Printf("%+v %q", m, str)
 
 		switch m.Dataset {
-		case "PTERM", "ITERM", "DTERM", "GYRO":
+		case "PTERM", "ITERM", "DTERM", "GYRO", "OUTPUT", "ANGLE_PTERM", "ANGLE_DTERM":
 			if len(datasets[m.Dataset]) > datasetLimit {
 				datasets[m.Dataset] = datasets[m.Dataset][:1]
 			}
@@ -141,7 +141,7 @@ func readSerial() {
 				mustParseFloat(m.Payload["PITCH"]),
 				mustParseFloat(m.Payload["YAW"]),
 			})
-		case "ACCEL", "ANGLE":
+		case "ACCEL", "ANGLE", "STICK":
 			if len(datasets[m.Dataset]) > datasetLimit {
 				datasets[m.Dataset] = datasets[m.Dataset][:1]
 			}
@@ -186,14 +186,28 @@ func SVGDataset(w http.ResponseWriter, r *http.Request) {
 	s := svg.New(w)
 	s.Start(5000, 1000)
 
+	/*
 	s.Text(0, 15, fmt.Sprintf("GYRO ROLL %f", datasets["GYRO"][len(datasets["GYRO"])-1].Pitch), "fill:red")
 	drawLine(s, "GYRO", "red", 0, 500)
 
 	s.Text(0, 30, fmt.Sprintf("ACCEL ROLL %f", datasets["ACCEL"][len(datasets["ACCEL"])-1].Pitch), "fill:green")
 	drawLine(s, "ACCEL", "green", 0, 500)
+	*/
 
-	s.Text(0, 45, fmt.Sprintf("ANGLE ROLL %f", datasets["ANGLE"][len(datasets["ANGLE"])-1].Pitch), "fill:blue")
-	drawLine(s, "ANGLE", "blue", 0, 500)
+	s.Text(0, 15, fmt.Sprintf("ANGLE ROLL %f", datasets["ANGLE"][len(datasets["ANGLE"])-1].Pitch), "fill:black")
+	drawLine(s, "ANGLE", "black", 0, 500)
+
+	s.Text(0, 30, fmt.Sprintf("STICK ROLL %f", datasets["STICK"][len(datasets["STICK"])-1].Pitch), "fill:blue")
+	drawLine(s, "STICK", "blue", 0, 500)
+
+	s.Text(0, 45, fmt.Sprintf("PTERM ROLL %f", datasets["ANGLE_PTERM"][len(datasets["ANGLE_PTERM"])-1].Pitch), "fill:red")
+	drawLine(s, "ANGLE_PTERM", "red", 0, 500)
+
+	s.Text(0, 60, fmt.Sprintf("DTERM ROLL %f", datasets["ANGLE_DTERM"][len(datasets["ANGLE_DTERM"])-1].Pitch), "fill:green")
+	drawLine(s, "ANGLE_DTERM", "green", 0, 500)
+
+	s.Text(0, 75, fmt.Sprintf("OUTPUT ROLL %f", datasets["OUTPUT"][len(datasets["OUTPUT"])-1].Pitch), "fill:orange")
+	drawLine(s, "OUTPUT", "orange", 0, 500)
 
 	s.End()
 }
