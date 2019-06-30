@@ -69,11 +69,7 @@ public:
     if (len == 0) {
       return {0, 0, 0};
     }
-    return vector{
-      v[0] / len,
-      v[1] / len,
-      v[2] / len
-    };
+    return v / len;
   }
 
   static vector cross(const vector& v0, const vector& v1) {
@@ -113,6 +109,14 @@ public:
       values[0] * v[0],
       values[1] * v[1],
       values[2] * v[2]
+    };
+  }
+
+  vector operator /(float v) const {
+    return vector{
+      values[0] / v,
+      values[1] / v,
+      values[2] / v
     };
   }
 

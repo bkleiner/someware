@@ -46,6 +46,14 @@ namespace control::filter {
       R = Q / HZ_90;
     }
 
+    vector step(vector in) {
+      return vector{
+        step(0, in[0]),
+        step(1, in[1]),
+        step(2, in[2]),
+      };
+    }
+
     float step(uint8_t axis, float in) {    
       //do a prediction 
       const float temp_est = last_estimation[axis]; 
@@ -108,14 +116,6 @@ namespace control::filter {
 
   static float constrain_min_max(float val, float min, float max) {
     return (val < min) ? min : ((val > max) ? max : val);
-  }
-
-  static float simple_lowpass(float last, float in, float Q) {
-    return last * Q + in * (1.0f - Q); 
-  }
-
-  static vector simple_lowpass(vector last, vector in, float Q) {
-    return last * Q + in * (1.0f - Q); 
   }
   
 }

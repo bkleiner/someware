@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -54,7 +55,7 @@ func parse(s string) Message {
 			}
 			pos++
 		case PayloadDataState:
-			if pos == size-1 || s[pos] == ',' || s[pos] == ' ' {
+			if pos == size-1 || s[pos] == ',' {
 				if pos == size-1 {
 					pos++
 				}
@@ -94,6 +95,8 @@ type Vector struct {
 	Yaw   float32
 }
 
+const datasetLimit = 100
+
 var datasets = map[string][]Vector{}
 
 func readSerial() {
@@ -111,21 +114,25 @@ func readSerial() {
 	}
 	defer port.Close()
 
-	/*
-		if _, err := port.Write([]byte{'T'}); err != nil {
-			log.Fatalf("port.Write: %v", err)
-		}
-	*/
+	if _, err := port.Write([]byte{'T'}); err != nil {
+		log.Fatalf("port.Write: %v", err)
+	}
 
+	runup := 10
 	scanner := bufio.NewScanner(port)
 	for scanner.Scan() {
+		if runup > 0 {
+			runup--
+			continue
+		}
+
 		str := scanner.Text()
 		m := parse(str)
 		log.Printf("%+v %q", m, str)
 
 		switch m.Dataset {
 		case "PTERM", "ITERM", "DTERM", "GYRO":
-			if (len(datasets[m.Dataset]) > 100) {
+			if len(datasets[m.Dataset]) > datasetLimit {
 				datasets[m.Dataset] = datasets[m.Dataset][:1]
 			}
 
@@ -133,6 +140,16 @@ func readSerial() {
 				mustParseFloat(m.Payload["ROLL"]),
 				mustParseFloat(m.Payload["PITCH"]),
 				mustParseFloat(m.Payload["YAW"]),
+			})
+		case "ACCEL", "ANGLE":
+			if len(datasets[m.Dataset]) > datasetLimit {
+				datasets[m.Dataset] = datasets[m.Dataset][:1]
+			}
+
+			datasets[m.Dataset] = append(datasets[m.Dataset], Vector{
+				mustParseFloat(m.Payload["Y"]),
+				mustParseFloat(m.Payload["X"]),
+				mustParseFloat(m.Payload["Z"]),
 			})
 		}
 	}
@@ -157,8 +174,8 @@ func BinaryDataset(w http.ResponseWriter, r *http.Request) {
 func drawLine(s *svg.SVG, set, color string, offsetX, offsetY int) {
 	x, y := []int{}, []int{}
 	for i, d := range datasets[set] {
-		y = append(y, offsetY+int(d.Roll*100))
-		x = append(x, offsetX+i*25)
+		y = append(y, offsetY+int(d.Roll*250))
+		x = append(x, offsetX+i*10)
 	}
 	s.Polyline(x, y, "fill:none;stroke:"+color)
 }
@@ -167,19 +184,16 @@ func SVGDataset(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/svg+xml")
 
 	s := svg.New(w)
-	s.Start(5000, 500)
+	s.Start(5000, 1000)
 
-	s.Text(0, 15, "PTERM ROLL", "fill:red")
-	drawLine(s, "PTERM", "red", 0, 450)
+	s.Text(0, 15, fmt.Sprintf("GYRO ROLL %f", datasets["GYRO"][len(datasets["GYRO"])-1].Roll), "fill:red")
+	drawLine(s, "GYRO", "red", 0, 500)
 
-	s.Text(0, 30, "ITERM ROLL", "fill:green")
-	drawLine(s, "ITERM", "green", 0, 450)
+	s.Text(0, 30, fmt.Sprintf("ACCEL ROLL %f", datasets["ACCEL"][len(datasets["ACCEL"])-1].Roll), "fill:green")
+	drawLine(s, "ACCEL", "green", 0, 500)
 
-	s.Text(0, 45, "DTERM ROLL", "fill:blue")
-	drawLine(s, "DTERM", "blue", 0, 450)
-
-	s.Text(0, 60, "GYRO ROLL", "fill:black")
-	drawLine(s, "GYRO", "black", 0, 450)
+	s.Text(0, 45, fmt.Sprintf("ANGLE ROLL %f", datasets["ANGLE"][len(datasets["ANGLE"])-1].Roll), "fill:blue")
+	drawLine(s, "ANGLE", "blue", 0, 500)
 
 	s.End()
 }

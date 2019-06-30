@@ -188,14 +188,14 @@ mpu_6000::mpu_6000(spi* bus, gpio::pin* cs)
   platform::time::delay_us(15);
 
   // Accel +/- 16 G Full Scale
-  bus->bus_write_register(cs, MPU_RA_ACCEL_CONFIG, BITS_FS_16G);
+  bus->bus_write_register(cs, MPU_RA_ACCEL_CONFIG, BITS_FS_2G);
   platform::time::delay_us(15);
 
   bus->bus_write_register(cs, MPU_RA_INT_ENABLE, 0x00);
   platform::time::delay_us(15);
 
-  // bus->bus_write_register(cs, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
-  // platform::time::delay_us(15);
+  bus->bus_write_register(cs, MPU_RA_INT_PIN_CFG, 0 << 7 | 0 << 6 | 0 << 5 | 1 << 4 | 0 << 3 | 0 << 2 | 0 << 1 | 0 << 0);  // INT_ANYRD_2CLEAR
+  platform::time::delay_us(15);
 
   bus->set_divisor(spi::SPI_CLOCK_FAST);
   platform::time::delay_us(1);
@@ -207,7 +207,7 @@ float mpu_6000::read_temparture() {
 }
 
 float tranform_gyro(int16_t value) {
-  static constexpr const float factor = 2000.f / 32768.f;
+  static constexpr const float factor = 2000.f / float(INT16_MAX);
   return float(value) * factor;
 }
 
@@ -223,7 +223,7 @@ vector mpu_6000::read_gyro() {
 }
 
 float tranform_accel(int16_t value) {
-  static constexpr const float factor = 16.f / 32768.f;
+  static constexpr const float factor = 2.f / float(INT16_MAX);
   return float(value) * factor;
 }
 
@@ -237,7 +237,7 @@ vector mpu_6000::read_accel() {
   );
 }
 
-static const constexpr uint32_t pass_time_us = 500 * 1000;
+static const constexpr uint32_t pass_time_us = 2 * 1000 * 1000;
 static const constexpr int32_t max_samples = 250;
 static const constexpr int32_t max_passes = 2;
 

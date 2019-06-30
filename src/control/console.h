@@ -50,21 +50,21 @@ namespace control {
           );
           usb.printf(
             "GYRO ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
-            ctrl.gyro.roll(),
-            ctrl.gyro.pitch(),
-            ctrl.gyro.yaw()
+            ctrl.imu.gyro.roll(),
+            ctrl.imu.gyro.pitch(),
+            ctrl.imu.gyro.yaw()
           );
           usb.printf(
             "ACCEL X: %5.2f, Y: %5.2f, Z: %5.2f\r\n", 
-            ctrl.accel.roll(),
-            ctrl.accel.pitch(),
-            ctrl.accel.yaw()
+            ctrl.imu.accel.roll(),
+            ctrl.imu.accel.pitch(),
+            ctrl.imu.accel.yaw()
           );
           usb.printf(
-            "ANGEL X: %5.2f, Y: %5.2f, Z: %5.2f\r\n", 
-            ctrl.angel.roll(),
-            ctrl.angel.pitch(),
-            ctrl.angel.yaw()
+            "ANGLE X: %5.2f, Y: %5.2f, Z: %5.2f\r\n", 
+            ctrl.imu.angle.roll(),
+            ctrl.imu.angle.pitch(),
+            ctrl.imu.angle.yaw()
           );
           usb.printf(
             "STICK X: %5.2f, Y: %5.2f, Z: %5.2f\r\n", 
