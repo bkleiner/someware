@@ -13,14 +13,16 @@ namespace control {
     float yaw;	    // R
   };
 
+  struct motor_mix {
+    int8_t throttle; // T
+    int8_t roll; 	   // A
+    int8_t pitch;	   // E
+    int8_t yaw;	     // R
+  };
+  
   class mixer {
   public:
-    struct motor_mix {
-      int8_t throttle; // T
-      int8_t roll; 	   // A
-      int8_t pitch;	   // E
-      int8_t yaw;	     // R
-    };
+    
 
     mixer(board* brd)
       : brd(brd)
@@ -63,14 +65,6 @@ namespace control {
     }
 
   private:
-    static const uint8_t motor_count = 4;
-    const motor_mix motor_mixes[motor_count] = {
-      // T   R   P   Y
-      { +1, +1, +1, +1 }, // 1 rear left
-      { +1, +1, -1, -1 }, // 2 front left
-      { +1, -1, +1, -1 }, // 3 rear right
-      { +1, -1, -1, +1 }  // 4 front  right
-    };
     float motors[motor_count];
 
     board* brd;

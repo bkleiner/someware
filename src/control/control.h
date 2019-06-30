@@ -19,9 +19,9 @@ namespace control
     control(board* brd)
       : brd(brd)
       , cfg(*((config*)brd->flash().pointer()))
+      , mix(brd)
       , imu(brd, &cfg)
       , rate_pid(&cfg)
-      , mix(brd)
     {}
 
     void update(float dt, rx::rx& recv) {
@@ -91,12 +91,8 @@ namespace control
       if (is_armed()) {
         mix.set_demands(output_demands);
       } else {
-        disarm();
+        mix.set_all(0.0f);
       }
-    }
-
-    void disarm() {
-      mix.set_all(0.0f);
     }
 
     bool is_armed() {
@@ -123,6 +119,7 @@ namespace control
 
     board* brd;
     config cfg;
+    mixer mix;
 
     inertial_measurement imu;
     pid::rate_controller rate_pid;
@@ -132,20 +129,6 @@ namespace control
   private:
     bool angle_mode = false;
     bool config_dirty = false;
-
-    const float rate_limit_deg = 360.f;
-    const float angle_limit_deg = 180.0f;
-    const float accel_limits[2] = { 0.7f, 1.3f };
-
-    const demands rc_rate = {
-      1.0f, // T
-      0.5f, // A
-      0.5f, // E
-      0.5f  // R
-    };
-    
-    
-    mixer mix;
 
     filter::biquad_lowpass rc_filter[4] = {
       { 120, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },

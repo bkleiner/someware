@@ -8,31 +8,6 @@
 
 #include "util/vector.h"
 
-
-#ifndef DTERM_LPF_2ND_HZ 
-#define DTERM_LPF_2ND_HZ 99
-#endif
-
-static constexpr float filter_calc(float sampleperiod, float filtertime) {
-  return (1.0f - (6.0f * sampleperiod) / (3.0f * sampleperiod + filtertime));
-}
-
-float lpf2(float in, int axis) {
-  static const constexpr float two_one_minus_alpha = 2 * filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ));
-  static const constexpr float one_minus_alpha_sqr = (filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ))) * (filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ)));
-  static const constexpr float alpha_sqr = (1 - filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ))) * (1 - filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ)));
-
-  static vector last_out, last_out2;
-
-  float ans = in * alpha_sqr + two_one_minus_alpha * last_out[axis]
-      - one_minus_alpha_sqr * last_out2[axis];   
-
-  last_out2[axis] = last_out[axis];
-  last_out[axis] = ans;
-
-  return ans;
-}
-
 namespace control::pid {
 
   class rate_controller {
@@ -85,7 +60,7 @@ namespace control::pid {
       // skip yaw D term if not set
       if (cfg->pid_kd[axis] > 0) {
         dterm[axis] = -(actual[axis] - lastrate[axis]) / dt * cfg->pid_kd[axis];
-        // dterm[axis] = lpf2(dterm[axis], axis);
+        // dterm[axis] = filter::lpf2(dterm[axis], axis);
         dterm[axis] = gyro_filter[axis].step(dterm[axis]);
         lastrate[axis] = actual[axis];
       } else {
@@ -105,8 +80,7 @@ namespace control::pid {
 
   private:
     const config* cfg = nullptr;
-    const vector integral_limit = { 1.7 , 1.7 , 0.5 };
-    
+
     filter::biquad_lowpass gyro_filter[3] = {
       {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
       {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},

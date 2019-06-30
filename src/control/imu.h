@@ -51,7 +51,7 @@ namespace control
         angle = (angle + gyro * dts) * (1.0f - alpha);
 
         const auto magnitude = accel.length();
-        if (magnitude > 0.7 && magnitude < 1.3f) {
+        if (magnitude > accel_limits_min && magnitude < accel_limits_max) {
           angle = angle + accel * alpha;
         }
 

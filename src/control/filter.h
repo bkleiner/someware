@@ -121,5 +121,26 @@ namespace control::filter {
   static float expo(float val, float exp) {
     return constrain_min_max(val * val * val * exp + val * (1 - exp), -1, 1);
   }
-  
+
+  static constexpr float filter_calc(float sampleperiod, float filtertime) {
+    return (1.0f - (6.0f * sampleperiod) / (3.0f * sampleperiod + filtertime));
+  }
+
+  #define DTERM_LPF_2ND_HZ 99
+
+  float lpf2(float in, int axis) {
+    static const constexpr float two_one_minus_alpha = 2 * filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ));
+    static const constexpr float one_minus_alpha_sqr = (filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ))) * (filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ)));
+    static const constexpr float alpha_sqr = (1 - filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ))) * (1 - filter_calc(0.001, (1.0f / DTERM_LPF_2ND_HZ)));
+
+    static vector last_out, last_out2;
+
+    float ans = in * alpha_sqr + two_one_minus_alpha * last_out[axis]
+        - one_minus_alpha_sqr * last_out2[axis];   
+
+    last_out2[axis] = last_out[axis];
+    last_out[axis] = ans;
+
+    return ans;
+  }
 }
