@@ -6,15 +6,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
+
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
 </head>
 
 <body>
-  <img id="plot" src="http://localhost:8080/svg" alt="">
-  <script type="text/javascript">
+  <script>
+
+    // set the dimensions and margins of the graph
+    var margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    var width = 960 - margin.left - margin.right;
+    var height = 650 - margin.top - margin.bottom;
+
+    // set the ranges
+    var x = d3.scaleLinear().domain([0, 100]).range([0, width]);
+    var y = d3.scaleLinear().domain([-1, 1]).range([height, 0]);
+
+    // append the svg obgect to the body of the page
+    // appends a 'group' element to 'svg'
+    // moves the 'group' element to the top left margin
+    var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+    var defaultLine = d3.line()
+      .x(function (d, i) { return x(i); })
+      .y(function (d) { return y(d.Pitch); })
+    var lines = {
+      "GYRO": {
+        line: defaultLine,
+        width: 1.0
+      },
+      "ACCEL": {
+        line: defaultLine,
+        width: 1.0
+      },
+      "ANGLE": {
+        line: defaultLine,
+        width: 1.5
+      },
+    }
+
+    var keys = Object.keys(lines);
+    var legend = null;
+
+    var color = d3.scaleOrdinal()
+      .domain(keys)
+      .range(d3.schemeSet1);
+
+    function drawPlot(error, data) {
+      if (error) throw error;
+
+      for (const key in lines) {
+        const entry = lines[key];
+        lines[key].path = svg.append("path")
+          .datum(data[key])
+          .style("stroke", function (d) { return color(key) })
+          .attr("fill", "none")
+          .attr("stroke-width", entry.width)
+          .attr("d", entry.line);
+      }
+
+      // Add the X Axis
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+      // Add the Y Axis
+      svg.append("g")
+        .call(d3.axisLeft(y));
+
+      legend = svg.selectAll("legend")
+        .data(keys)
+        .enter()
+        .append("text")
+        .attr("x", 10)
+        .attr("y", function (d, i) { return 10 + i * 15 }) // 100 is where the first dot appears. 25 is the distance between dots
+        .style("fill", function (d) { return color(d) })
+        .text(function (d) { return d })
+        .attr("text-anchor", "left")
+        .style("alignment-baseline", "middle")
+        .style("font-size", "12px")
+    }
+
+    d3.json("http://localhost:8080/json", drawPlot);
     setInterval(function () {
-      var image = document.getElementById('plot');
-      image.src = "http://localhost:8080/svg";
-    }, 250);
+      d3.json("http://localhost:8080/json", function (data) {
+        for (const key in lines) {
+          const e = lines[key];
+          e
+            .path
+            .transition()
+            .duration(250)
+            .attr("d", e.line(data[key]));
+        }
+      });
+    }, 250)
   </script>
 </body>
 

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
+	"github.com/rs/cors"
 	svg "github.com/ajstarks/svgo"
 	"github.com/jacobsa/go-serial/serial"
 )
@@ -215,8 +215,11 @@ func SVGDataset(w http.ResponseWriter, r *http.Request) {
 func main() {
 	go readSerial()
 
-	http.Handle("/json", http.HandlerFunc(JsonDataset))
-	http.Handle("/svg", http.HandlerFunc(SVGDataset))
-	http.Handle("/binary", http.HandlerFunc(BinaryDataset))
-	http.ListenAndServe(":8080", nil)
+	mux := http.NewServeMux()
+	mux.Handle("/json", http.HandlerFunc(JsonDataset))
+	mux.Handle("/svg", http.HandlerFunc(SVGDataset))
+	mux.Handle("/binary", http.HandlerFunc(BinaryDataset))
+
+	handler := cors.Default().Handler(mux)
+	http.ListenAndServe(":8080", handler)
 }
