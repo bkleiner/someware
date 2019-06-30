@@ -133,32 +133,23 @@ namespace control::pid {
 
     float calc_axis(float dt, uint8_t axis, const vector& error, const vector& actual) {
       const float one_over_dt = 1.0f / dt;
+      
+      pterm[axis] = error[axis] * pid_kp;
+      dterm[axis] = (error[axis] - lasterror[axis]) * pid_kd * one_over_dt;
 
-      // P term 1 weighted
-      float output1 = (1.0f - fabsf(error[axis])) * error[axis] * pidkp1;
-      // D term 1 weighted + P term 1 weighted
-      output1 += (error[axis] - lasterror[axis]) * pidkd1 * (1-fabsf(error[axis])) * one_over_dt;
-      
-      // P term 2 weighted
-      float output2 = fabsf(error[axis]) * error[axis] * pidkp2;
-      // D term 2 weighted + P term 2 weighted
-      output2 += ((error[axis] - lasterror[axis]) * pidkd2 * fabsf(error[axis]) * one_over_dt);
-      
-      // apidoutput sum
-      const float output = output1 + output2;
       lasterror[axis] = error[axis];
       
-      return filter::constrain_min_max(output, -output_limit, output_limit);
+      return pterm[axis] + dterm[axis];
     }
 
+    vector pterm;
+    vector dterm;
+
   private:
-    const float pidkp1 = 10.0;
-    const float pidkd1 =  3.0;
+    const float pid_kp = 10.0;
+    const float pid_kd = 3.0;
 
-    const float pidkp2 = 5.0;
-    const float pidkd2 = 0.0;
-
-    const float output_limit = pidkp1 + pidkd1;
+    const float output_limit = pid_kp;
 
     vector lasterror;
   };

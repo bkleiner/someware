@@ -91,6 +91,18 @@ namespace control {
             ctrl.rate_pid.dterm.yaw()
           );
           usb.printf(
+            "ANGLE_PTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
+            ctrl.angle_pid.pterm.roll(),
+            ctrl.angle_pid.pterm.pitch(),
+            ctrl.angle_pid.pterm.yaw()
+          );
+          usb.printf(
+            "ANGLE_DTERM ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n", 
+            ctrl.angle_pid.dterm.roll(),
+            ctrl.angle_pid.dterm.pitch(),
+            ctrl.angle_pid.dterm.yaw()
+          );
+          usb.printf(
             "OUTPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",
             ctrl.output_demands.throttle,
             ctrl.output_demands.roll,
