@@ -37,6 +37,10 @@ namespace control
           rate_pid.reset();
           armed = true;
         }
+
+        if (recv.get(rx::AUX2) > 0.5f)  {
+          angle_mode = true;
+        }
       } else {
         if (gesture.update(dt, recv, cfg)) {
           config_dirty = true;
@@ -46,9 +50,9 @@ namespace control
 
       input_demands = {
         rc_filter[0].step(recv.get(rx::THR)) * rc_rate.throttle,
-        rc_filter[3].step(recv.get(rx::AIL)) * rc_rate.roll,
-        rc_filter[2].step(recv.get(rx::ELE)) * rc_rate.pitch,
-        rc_filter[1].step(recv.get(rx::RUD)) * rc_rate.yaw
+        filter::expo(rc_filter[3].step(recv.get(rx::AIL)) * rc_rate.roll, 0.8),
+        filter::expo(rc_filter[2].step(recv.get(rx::ELE)) * rc_rate.pitch, 0.8),
+        filter::expo(rc_filter[1].step(recv.get(rx::RUD)) * rc_rate.yaw, 0.6)
       };
 
       vector rates = {0, 0, 0};
@@ -126,18 +130,18 @@ namespace control
     gesture_controller gesture;
 
   private:
-    bool angle_mode = true;
+    bool angle_mode = false;
     bool config_dirty = false;
 
-    const float rate_limit_deg = 860.f;
+    const float rate_limit_deg = 360.f;
     const float angle_limit_deg = 180.0f;
     const float accel_limits[2] = { 0.7f, 1.3f };
 
     const demands rc_rate = {
       1.0f, // T
-      1.0f, // A
-      1.0f, // E
-      1.0f  // R
+      0.5f, // A
+      0.5f, // E
+      0.5f  // R
     };
     
     

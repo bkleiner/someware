@@ -85,8 +85,8 @@ namespace control::pid {
       // skip yaw D term if not set
       if (cfg->pid_kd[axis] > 0) {
         dterm[axis] = -(actual[axis] - lastrate[axis]) / dt * cfg->pid_kd[axis];
-        dterm[axis] = lpf2(dterm[axis], axis);
-        // dterm[axis] = gyro_filter[axis].step(dterm[axis]);
+        // dterm[axis] = lpf2(dterm[axis], axis);
+        dterm[axis] = gyro_filter[axis].step(dterm[axis]);
         lastrate[axis] = actual[axis];
       } else {
         dterm[axis] = 0;
@@ -106,7 +106,8 @@ namespace control::pid {
   private:
     const config* cfg = nullptr;
     const vector integral_limit = { 1.7 , 1.7 , 0.5 };
-    const filter::biquad_lowpass gyro_filter[3] = {
+    
+    filter::biquad_lowpass gyro_filter[3] = {
       {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
       {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
       {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},

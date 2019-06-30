@@ -117,5 +117,9 @@ namespace control::filter {
   static float constrain_min_max(float val, float min, float max) {
     return (val < min) ? min : ((val > max) ? max : val);
   }
+
+  static float expo(float val, float exp) {
+    return constrain_min_max(val * val * val * exp + val * (1 - exp), -1, 1);
+  }
   
 }

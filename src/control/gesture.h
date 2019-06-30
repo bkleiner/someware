@@ -17,10 +17,10 @@ namespace control {
         term = &cfg.pid_kd;
       }
 
-      if (term && recv.get(rx::THR) > 0.9f) {
+      if (term && recv.get(rx::THR) > 0.5f) {
         modify_value(recv, &(*term)[vector::ROLL], rx::ELE, vector::ROLL);
         modify_value(recv, &(*term)[vector::PITCH], rx::ELE, vector::PITCH);
-        //modify_value(recv, &(*term)[vector::YAW], rx::AIL, vector::YAW);
+        modify_value(recv, &(*term)[vector::YAW], rx::AIL, vector::YAW);
         return true;
       }
       return false;
@@ -42,7 +42,7 @@ namespace control {
       }
     }
 
-    const float active_threshold = 0.8f;
+    const float active_threshold = 0.7f;
     bool axis_active[3] = {
       false,
       false,
