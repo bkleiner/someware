@@ -174,7 +174,7 @@ func BinaryDataset(w http.ResponseWriter, r *http.Request) {
 func drawLine(s *svg.SVG, set, color string, offsetX, offsetY int) {
 	x, y := []int{}, []int{}
 	for i, d := range datasets[set] {
-		y = append(y, offsetY+int(d.Roll*250))
+		y = append(y, offsetY+int(d.Pitch*250))
 		x = append(x, offsetX+i*10)
 	}
 	s.Polyline(x, y, "fill:none;stroke:"+color)
@@ -186,13 +186,13 @@ func SVGDataset(w http.ResponseWriter, r *http.Request) {
 	s := svg.New(w)
 	s.Start(5000, 1000)
 
-	s.Text(0, 15, fmt.Sprintf("GYRO ROLL %f", datasets["GYRO"][len(datasets["GYRO"])-1].Roll), "fill:red")
+	s.Text(0, 15, fmt.Sprintf("GYRO ROLL %f", datasets["GYRO"][len(datasets["GYRO"])-1].Pitch), "fill:red")
 	drawLine(s, "GYRO", "red", 0, 500)
 
-	s.Text(0, 30, fmt.Sprintf("ACCEL ROLL %f", datasets["ACCEL"][len(datasets["ACCEL"])-1].Roll), "fill:green")
+	s.Text(0, 30, fmt.Sprintf("ACCEL ROLL %f", datasets["ACCEL"][len(datasets["ACCEL"])-1].Pitch), "fill:green")
 	drawLine(s, "ACCEL", "green", 0, 500)
 
-	s.Text(0, 45, fmt.Sprintf("ANGLE ROLL %f", datasets["ANGLE"][len(datasets["ANGLE"])-1].Roll), "fill:blue")
+	s.Text(0, 45, fmt.Sprintf("ANGLE ROLL %f", datasets["ANGLE"][len(datasets["ANGLE"])-1].Pitch), "fill:blue")
 	drawLine(s, "ANGLE", "blue", 0, 500)
 
 	s.End()
