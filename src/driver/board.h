@@ -5,6 +5,7 @@
 #include "serial.h"
 #include "flash.h"
 #include "gpio.h"
+#include "adc.h"
 
 namespace motor
 {
@@ -31,6 +32,7 @@ public:
   virtual accel::accel& accel() = 0;
   virtual flash_memory& flash() = 0;
   virtual pwm::pwm& motor(motor::motors) = 0;
+  virtual adc::adc& vbat_adc() = 0;
 
   virtual void reset() = 0;
   virtual void reset_to_bootloader() = 0;

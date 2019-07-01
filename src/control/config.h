@@ -36,7 +36,7 @@ namespace control {
   static const constexpr float accel_limits_max = 1.3f;
   
   //                               ROLL   PITCH    YAW
-  static const vector default_pid_kp = {  0.215,   0.215,   0.14 };
+  static const vector default_pid_kp = {  0.215,   0.215,   0.15 };
   static const vector default_pid_ki = {   1.23,    1.23,   1.04 };	
   static const vector default_pid_kd = {  0.795,   0.795,   0.6  };
 

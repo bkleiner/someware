@@ -25,6 +25,12 @@ namespace control
     {}
 
     void update(float dt, rx::rx& recv) {
+      vbat = brd->vbat_adc().read();
+      if (!brd->usb_serial_active() && vbat < battery_safety_min) {
+        brd->power_off();
+        return;
+      }
+
       imu.update(dt);
 
       if (recv.get(rx::AUX1) > 0.5f) {
@@ -88,15 +94,11 @@ namespace control
         rates.yaw()
       };
 
-      if (is_armed()) {
+      if (armed) {
         mix.set_demands(output_demands);
       } else {
         mix.set_all(0.0f);
       }
-    }
-
-    bool is_armed() {
-      return armed;
     }
 
     bool is_airborn() {
@@ -111,6 +113,7 @@ namespace control
     }
 
     bool armed = false;
+    uint16_t vbat = 0;
     
     vector stick_vector = {0, 0, 0};
     

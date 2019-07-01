@@ -101,8 +101,12 @@ namespace stm32_f3 {
     using UART3_RX_PORT = gpio::port<gpio::B, 11>;
 
     adc::adc<
-      adc::DEVICE2,
+      ::adc::DEVICE2,
       gpio::port<gpio::A, 4>
-    > vbat_adc;
+    > _vbat_adc;
+
+    ::adc::adc& vbat_adc() override {
+      return _vbat_adc;
+    }
   };
 }

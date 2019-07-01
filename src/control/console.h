@@ -28,11 +28,12 @@ namespace control {
             sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)
           );
           usb.printf(
-            "CTRL DT: %5.2f, FREQ: %5.2fkHz, ARMED: %d, AIRBORN: %d\r\n",
+            "CTRL DT: %5.2f, FREQ: %5.2fkHz, ARMED: %d, AIRBORN: %d, VBAT: %u\r\n",
             dt,
             (1000.f / dt) / 1000.f,
             ctrl.armed,
-            ctrl.is_airborn()
+            ctrl.is_airborn(),
+            ctrl.vbat
           );
           usb.printf(
             "RX THR: %d, ROLL: %d, PITCH: %d, YAW: %d\r\n",

@@ -15,11 +15,6 @@ int main() {
 
   auto last_time = board.micros();
   while (true) {
-    const auto vbat = board.vbat_adc.read();
-    if (!board.usb_serial_active() && vbat < control::battery_safety_min) {
-      board.power_off();
-    }
-
     const auto start = board.micros();
     const float dt = float(start - last_time) * 0.001f;
     last_time = start;

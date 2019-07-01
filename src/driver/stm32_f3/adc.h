@@ -4,45 +4,39 @@
 #include <stm32f30x_conf.h>
 
 #include "gpio.h"
+#include "driver/adc.h"
 
 namespace stm32_f3::adc {
-  enum names {
-    DEVICE1,
-    DEVICE2,
-    DEVICE3,
-    DEVICE4,
-  };
-
-  template<names _name>
+  template<::adc::names _name>
   struct hardware {
     static inline ADC_TypeDef* get() {
       switch (_name) {
-      case DEVICE1:
+      case ::adc::DEVICE1:
         return ADC1;
-      case DEVICE2:
+      case ::adc::DEVICE2:
         return ADC2;
-      case DEVICE3:
+      case ::adc::DEVICE3:
         return ADC3;
-      case DEVICE4:
+      case ::adc::DEVICE4:
         return ADC4;
       }
     }
 
     static inline void enable() {
       switch (_name) {
-      case DEVICE1:
+      case ::adc::DEVICE1:
         RCC_ADCCLKConfig(RCC_ADC12PLLCLK_Div256);
         RCC_AHBPeriphClockCmd(RCC_AHBPeriph_ADC12, ENABLE);
         break;
-      case DEVICE2:
+      case ::adc::DEVICE2:
         RCC_ADCCLKConfig(RCC_ADC12PLLCLK_Div256);
         RCC_AHBPeriphClockCmd(RCC_AHBPeriph_ADC12, ENABLE);
         break;
-      case DEVICE3:
+      case ::adc::DEVICE3:
         RCC_ADCCLKConfig(RCC_ADC34PLLCLK_Div256);
         RCC_AHBPeriphClockCmd(RCC_AHBPeriph_ADC34, ENABLE);
         break;
-      case DEVICE4:
+      case ::adc::DEVICE4:
         RCC_ADCCLKConfig(RCC_ADC34PLLCLK_Div256);
         RCC_AHBPeriphClockCmd(RCC_AHBPeriph_ADC34, ENABLE);
         break;
@@ -51,18 +45,12 @@ namespace stm32_f3::adc {
   };
 
   template<
-    names _name,
+    ::adc::names _name,
     typename _port
   >
-  struct adc {
+  class adc : public ::adc::adc {
+  public:
     using hw = hardware<_name>;
-    using pin_mode = gpio::mode<
-      gpio::modes::analog,
-      gpio::modes::push_pull,
-      gpio::modes::speed_50MHz,
-      gpio::modes::no_pull
-    >;
-    using pin_type = gpio::pin<_port, pin_mode>;
 
     adc() {
       hw::enable();
@@ -76,7 +64,7 @@ namespace stm32_f3::adc {
       ADC_StartCalibration(hw::get());
 
       while(ADC_GetCalibrationStatus(hw::get()) != RESET );
-      calibration_value = ADC_GetCalibrationValue(hw::get());
+      _calibration_value = ADC_GetCalibrationValue(hw::get());
 
       ADC_InitTypeDef adc_init;
       adc_init.ADC_ContinuousConvMode    = ADC_ContinuousConvMode_Enable;
@@ -97,12 +85,22 @@ namespace stm32_f3::adc {
       ADC_StartConversion(hw::get());
     }
 
-    uint16_t read() {
+    uint16_t read() override {
       while(ADC_GetFlagStatus(hw::get(), ADC_FLAG_EOC) == RESET);
-      return ((ADC_GetConversionValue(hw::get()) + calibration_value) * 3300) / 0xFFF;
+      return ((ADC_GetConversionValue(hw::get()) + _calibration_value) * 3300) / 0xFFF;
     }
 
-    uint16_t calibration_value;
+  private:
+    using pin_mode = gpio::mode<
+      gpio::modes::analog,
+      gpio::modes::push_pull,
+      gpio::modes::speed_50MHz,
+      gpio::modes::no_pull
+    >;
+    using pin_type = gpio::pin<_port, pin_mode>;
+
+    pin_type _pin;
+    uint16_t _calibration_value;
   };
 }
 
