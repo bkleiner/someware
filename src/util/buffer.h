@@ -7,19 +7,19 @@
 template<class type>
 class buffer {
 public:
-  buffer() 
+  constexpr buffer() 
     : _size(0)
     , _data(nullptr)
   {}
 
-  explicit buffer(size_t size)
+  explicit constexpr buffer(size_t size)
     : _size(size)
     , _data(new type[size])
   {
     fill(0);
   }
 
-  explicit buffer(const void* stuff, size_t size) 
+  explicit constexpr buffer(const void* stuff, size_t size) 
     : buffer(size)
   {
     copy(stuff);

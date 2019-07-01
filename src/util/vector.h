@@ -10,17 +10,21 @@ public:
     YAW
   };
 
-  vector()
-    : vector(0.f)
+  constexpr vector()
+    : values()
   {}
 
-  vector(float v) {
+  constexpr vector(float v) 
+    : values()
+  {
     values[0] = v;
     values[1] = v;
     values[2] = v;
   }
 
-  vector(float x, float y, float z) {
+  constexpr vector(float x, float y, float z) 
+    : values()
+  {
     values[0] = x;
     values[1] = y;
     values[2] = z;

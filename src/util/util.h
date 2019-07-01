@@ -9,54 +9,6 @@
 
 #define FAST_FTOA_PRECISSION 2
 
-class string {
-public:
-  string() {}
-
-  string(const char* src) 
-    : string(src, std::strlen(src))
-  {}
-
-  string(const char* src, size_t size) 
-    : str(new char[size])
-  {
-    memcpy(str, src, size);
-
-    if (str[size-1] != 0) {
-      append(0);
-    }
-  }
-
-  ~string() {
-    delete[] str;
-  }
-
-  void append(const char* src) {
-    char* tmp = std::strcat(str, src);
-    delete[] str;
-    str = tmp;
-  }
-
-  const char* c_str() const {
-    return str;
-  }
-
-  uint8_t* data() const {
-    return (uint8_t*)str;
-  }
-
-  size_t size() const {
-    return std::strlen(str);
-  }
-
-  bool operator==(const string& other) const {
-    return std::strcmp(str, other.str);
-  }
-
-private:
-  char* str;
-};
-
 namespace util {
 
   template <uint8_t... values>

@@ -6,7 +6,7 @@
 template<class type>
 class ring_buffer {
 public:
-  ring_buffer(size_t size)
+  constexpr ring_buffer(size_t size)
     : _buf(size)
     , _front(0)
     , _count(0)
