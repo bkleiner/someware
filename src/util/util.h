@@ -7,6 +7,8 @@
 #include "buffer.h"
 #include "ring_buffer.h"
 
+#define FAST_FTOA_PRECISSION 2
+
 class string {
 public:
   string() {}
@@ -111,4 +113,31 @@ namespace util {
   {
       static const uint32_t value = 0;
   };
+
+  static void fast_ftoa(char* str, float v) {
+    uint32_t value = v * powf(10, FAST_FTOA_PRECISSION);
+    uint32_t index = 0;
+
+    while (value != 0) {
+      if (index == FAST_FTOA_PRECISSION) {
+        str[index++] = '.';
+      }
+
+      uint8_t digit = value % 10;
+      str[index++] = '0' + digit;
+      value /= 10;
+    }
+
+    for (uint32_t i = 0; i < index; i++) {
+      const uint32_t start = i;
+      const uint32_t end = index - i - 1;
+      if ((end - start) <= 1) {
+        break;
+      }
+      uint8_t tmp = str[end];
+      str[end] = str[start];
+      str[start] = tmp;
+    }
+    str[index+1] = 0;
+  }
 }

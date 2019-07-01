@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"os"
 	"log"
 	"net/http"
 	"strconv"
@@ -118,7 +119,13 @@ func readSerial() {
 		log.Fatalf("port.Write: %v", err)
 	}
 
-	runup := 10
+	f, err := os.Create("blackbox.txt")
+	if err != nil {
+		log.Fatalf("port.Write: %v", err)
+	}
+	defer f.Close()
+
+	runup := 20
 	scanner := bufio.NewScanner(port)
 	for scanner.Scan() {
 		if runup > 0 {
@@ -127,6 +134,8 @@ func readSerial() {
 		}
 
 		str := scanner.Text()
+		f.Write([]byte(str + "\n"));
+
 		m := parse(str)
 		log.Printf("%+v %q", m, str)
 

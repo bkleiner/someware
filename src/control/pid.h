@@ -16,15 +16,7 @@ namespace control::pid {
       : cfg(cfg)
     {}
 
-    void reset() {
-      pterm = vector(0);
-      iterm = vector(0);
-      dterm = vector(0);
-
-      lasterror = vector(0);
-      lasterror2 = vector(0);
-      lastrate = vector(0);
-    }
+    
 
     const vector calc(float dt, bool is_airborn, const vector& rate_setpoint, const vector& rate_actual) {
       const vector error = rate_setpoint - rate_actual;
@@ -39,6 +31,7 @@ namespace control::pid {
     float calc_axis(float dt, bool is_airborn, uint8_t axis, const vector& error, const vector& actual) {
       // gyro is in deg/s so we need your timestep in s (vs us)
       const float dts = dt / 1000.f;
+      const float one_over_dt = 1.0f / dt;
 
       // P Term 
       pterm[axis] = error[axis] * cfg->pid_kp[axis];
@@ -47,6 +40,7 @@ namespace control::pid {
       if (!is_airborn) {
         // if we are still on the ground the quad vibrates a lot etc.
         // so iterm winds if self up. we dim it down here for easier take of.
+        // todo: maybe more? or for longer? take off should be easier.
         iterm[axis] *= 0.98f;
       }
 
@@ -59,9 +53,9 @@ namespace control::pid {
       // D term
       // skip yaw D term if not set
       if (cfg->pid_kd[axis] > 0) {
-        dterm[axis] = -(actual[axis] - lastrate[axis]) / dt * cfg->pid_kd[axis];
-        // dterm[axis] = filter::lpf2(dterm[axis], axis);
-        dterm[axis] = gyro_filter[axis].step(dterm[axis]);
+        dterm[axis] = -(actual[axis] - lastrate[axis]) * one_over_dt * cfg->pid_kd[axis];
+        dterm[axis] = filter::lpf2(dterm[axis], axis);
+        // dterm[axis] = gyro_filter[axis].step(dterm[axis]);
         lastrate[axis] = actual[axis];
       } else {
         dterm[axis] = 0;
@@ -72,6 +66,16 @@ namespace control::pid {
 
       return pterm[axis] + iterm[axis] + dterm[axis];
     };
+
+    void reset() {
+      pterm = vector(0);
+      iterm = vector(0);
+      dterm = vector(0);
+
+      lasterror = vector(0);
+      lasterror2 = vector(0);
+      lastrate = vector(0);
+    }
 
 
     vector iterm;

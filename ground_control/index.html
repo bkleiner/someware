@@ -23,31 +23,27 @@
     var x = d3.scaleLinear().domain([0, 100]).range([0, width]);
     var y = d3.scaleLinear().domain([-1, 1]).range([height, 0]);
 
-    // append the svg obgect to the body of the page
-    // appends a 'group' element to 'svg'
-    // moves the 'group' element to the top left margin
-    var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform",
-        "translate(" + margin.left + "," + margin.top + ")");
-
-    var defaultLine = d3.line()
-      .x(function (d, i) { return x(i); })
-      .y(function (d) { return y(d.Pitch); })
     var lines = {
+      "ANGLE": {
+        width: 2
+      },
+      "OUTPUT": {
+        width: 2
+      },
       "GYRO": {
-        line: defaultLine,
         width: 1.0
       },
       "ACCEL": {
-        line: defaultLine,
         width: 1.0
       },
-      "ANGLE": {
-        line: defaultLine,
-        width: 1.5
+      "PTERM": {
+        width: 1.0
+      },
+      "ITERM": {
+        width: 1.0
+      },
+      "DTERM": {
+        width: 1.0
       },
     }
 
@@ -58,17 +54,27 @@
       .domain(keys)
       .range(d3.schemeSet1);
 
-    function drawPlot(error, data) {
-      if (error) throw error;
+    function drawPlot(data, axis) {
+      var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+      var defaultLine = d3.line()
+        .x(function (d, i) { return x(i); })
+        .y(function (d) { return y(d[axis]); });
 
       for (const key in lines) {
         const entry = lines[key];
-        lines[key].path = svg.append("path")
+        lines[key][axis] = {}
+        lines[key][axis].path = svg.append("path")
           .datum(data[key])
           .style("stroke", function (d) { return color(key) })
           .attr("fill", "none")
           .attr("stroke-width", entry.width)
-          .attr("d", entry.line);
+          .attr("d", lines[key][axis].line = defaultLine);
       }
 
       // Add the X Axis
@@ -93,16 +99,30 @@
         .style("font-size", "12px")
     }
 
-    d3.json("http://localhost:8080/json", drawPlot);
+    d3.json("http://localhost:8080/json", function (err, data) {
+      drawPlot(data, "Roll");
+      drawPlot(data, "Pitch");
+      drawPlot(data, "Yaw");
+    });
     setInterval(function () {
       d3.json("http://localhost:8080/json", function (data) {
         for (const key in lines) {
           const e = lines[key];
-          e
+          e["Roll"]
             .path
             .transition()
             .duration(250)
-            .attr("d", e.line(data[key]));
+            .attr("d", e["Roll"].line(data[key]));
+          e["Pitch"]
+            .path
+            .transition()
+            .duration(250)
+            .attr("d", e["Pitch"].line(data[key]));
+          e["Yaw"]
+            .path
+            .transition()
+            .duration(250)
+            .attr("d", e["Yaw"].line(data[key]));
         }
       });
     }, 250)

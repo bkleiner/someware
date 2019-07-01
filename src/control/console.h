@@ -22,7 +22,7 @@ namespace control {
 
 
       if (dump_ctrl) {
-        util::trigger_every<100>(time, [&] () {
+        util::trigger_every<250>(time, [&] () {
           usb.printf(
             "THR: %5.2f, AIL: %5.2f, ELE: %5.2f, RUD: %5.2f, AUX1: %5.2f, AUX2: %5.2f\r\n",
             sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)
