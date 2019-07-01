@@ -15,6 +15,11 @@ int main() {
 
   auto last_time = board.micros();
   while (true) {
+    const auto vbat = board.vbat_adc.read();
+    if (!board.usb_serial_active() && vbat < control::battery_safety_min) {
+      board.power_off();
+    }
+
     const auto start = board.micros();
     const float dt = float(start - last_time) * 0.001f;
     last_time = start;
@@ -30,13 +35,6 @@ int main() {
     {
       const auto now = board.micros();
       const auto delta = (now - start);
-
-      if (board.usb_serial_active()) {
-        // board.usb_serial().printf(
-        //   "dt: %fms (%.2fkHz) now: %u start: %u last_time: %u delta: %u delay: %d\r\n",
-        //   dt, (1000.0f / dt) * 0.001f, now, start, last_time, delta, LOOP_TIME - delta
-        // );
-      }
 
       if (delta > 0 && delta < LOOP_TIME)
         board.delay_us(LOOP_TIME - delta);

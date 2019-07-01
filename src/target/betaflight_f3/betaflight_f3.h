@@ -3,6 +3,7 @@
 #include "driver/stm32_f3/pwm.h"
 #include "driver/stm32_f3/gpio.h"
 #include "driver/stm32_f3/spi.h"
+#include "driver/stm32_f3/adc.h"
 #include "driver/stm32_f3/board.h"
 #include "driver/stm32_f3/serial_vcp.h"
 #include "driver/stm32_f3/serial_uart.h"
@@ -98,5 +99,10 @@ namespace stm32_f3 {
 
     using UART3_TX_PORT = gpio::port<gpio::B, 10>;
     using UART3_RX_PORT = gpio::port<gpio::B, 11>;
+
+    adc::adc<
+      adc::DEVICE2,
+      gpio::port<gpio::A, 4>
+    > vbat_adc;
   };
 }

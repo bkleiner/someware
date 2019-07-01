@@ -1,29 +1,13 @@
 #pragma once
 
+#include "config.h"
 #include "filter.h"
 
 #include "driver/board.h"
 
 namespace control {
-
-  struct demands {
-    float throttle; // T
-    float roll; 	  // A
-    float pitch;	  // E
-    float yaw;	    // R
-  };
-
-  struct motor_mix {
-    int8_t throttle; // T
-    int8_t roll; 	   // A
-    int8_t pitch;	   // E
-    int8_t yaw;	     // R
-  };
-  
   class mixer {
   public:
-    
-
     mixer(board* brd)
       : brd(brd)
     {}
@@ -49,7 +33,6 @@ namespace control {
           max_motor = motors[i];
 
       for (uint8_t i = 0; i < motor_count; i++) {
-
           // This is a way to still have good gyro corrections if at least one motor reaches its max
           if (max_motor > 1) {
               motors[i] -= max_motor - 1;

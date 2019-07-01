@@ -33,6 +33,9 @@ namespace stm32_f3 {
 
     void reset() override;
     void reset_to_bootloader() override;
+    void power_off() override {
+      PWR_EnterSTANDBYMode();
+    }
 
   private:
     flash_memory _flash;

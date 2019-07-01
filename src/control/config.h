@@ -8,6 +8,21 @@
 #define LOOP_TIME (1000000 / LOOP_FREQ_HZ)
 
 namespace control {
+  struct demands {
+    float throttle; // T
+    float roll; 	  // A
+    float pitch;	  // E
+    float yaw;	    // R
+  };
+
+  struct motor_mix {
+    int8_t throttle; // T
+    int8_t roll; 	   // A
+    int8_t pitch;	   // E
+    int8_t yaw;	     // R
+  };
+
+  static const constexpr uint16_t battery_safety_min = 3.2;
 
   // rate/angle mode limits
   static const constexpr float rate_limit_deg = 360.f;

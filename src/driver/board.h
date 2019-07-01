@@ -34,4 +34,5 @@ public:
 
   virtual void reset() = 0;
   virtual void reset_to_bootloader() = 0;
+  virtual void power_off() = 0;
 };
