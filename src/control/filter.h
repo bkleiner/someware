@@ -85,11 +85,12 @@ namespace control::filter {
       : biquad_lowpass(cutoff / sample_rate, q)
     {}
 
-    biquad_lowpass(float fc, float q) 
+    constexpr biquad_lowpass(float fc, float q) 
       : FC(fc)
       , Q(q)
-      , z1(0)
-      , z2(0)
+      , a0(0), a1(0), a2(0)
+      , b1(0), b2(0)
+      , z1(0), z2(0)
     {
       float K = tan(util::pi * FC);
       float norm = 1 / (1 + K / Q + K * K);

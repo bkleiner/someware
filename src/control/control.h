@@ -134,10 +134,10 @@ namespace control
     bool config_dirty = false;
 
     filter::biquad_lowpass rc_filter[4] = {
-      { 120, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 120, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 120, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 120, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
     };
   };
 }

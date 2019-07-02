@@ -86,9 +86,9 @@ namespace control::pid {
     const config* cfg = nullptr;
 
     filter::biquad_lowpass gyro_filter[3] = {
-      {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
-      {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
-      {120.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth},
+      { 180.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { 180.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { 180.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
     };
 
     vector lasterror;
@@ -125,8 +125,8 @@ namespace control::pid {
     vector dterm;
 
   private:
-    const float pid_kp = 10.0;
-    const float pid_kd = 3.0;
+    const float pid_kp = 7.0;
+    const float pid_kd = 0.0;
 
     const float output_limit = pid_kp;
 

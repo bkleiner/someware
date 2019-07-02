@@ -29,18 +29,18 @@ namespace control {
   static const constexpr float angle_limit_deg = 180.0f;
 
   // rate pind integral limit
-  static const vector integral_limit = { 1.7 , 1.7 , 0.5 };
+  static const constexpr vector integral_limit = { 1.7 , 1.7 , 0.5 };
 
   // imu accel limit
   static const constexpr float accel_limits_min = 0.7f;
   static const constexpr float accel_limits_max = 1.3f;
   
   //                               ROLL   PITCH    YAW
-  static const vector default_pid_kp = {  0.215,   0.215,   0.15 };
-  static const vector default_pid_ki = {   1.23,    1.23,   1.04 };	
-  static const vector default_pid_kd = {  0.795,   0.795,   0.6  };
+  static const constexpr vector default_pid_kp = {  0.215,   0.215,   0.15 };
+  static const constexpr vector default_pid_ki = {   1.23,    1.23,   1.04 };	
+  static const constexpr vector default_pid_kd = {  0.795,   0.795,   0.6  };
 
-  static const demands rc_rate = {
+  static const constexpr demands rc_rate = {
     1.0f, // T
     0.5f, // A
     0.5f, // E
@@ -49,7 +49,7 @@ namespace control {
 
   // mixer motor count and mapping
   static const constexpr uint8_t motor_count = 4;
-  static const motor_mix motor_mixes[motor_count] = {
+  static const constexpr motor_mix motor_mixes[motor_count] = {
     // T   R   P   Y
     { +1, +1, +1, +1 }, // 1 rear left
     { +1, +1, -1, -1 }, // 2 front left
