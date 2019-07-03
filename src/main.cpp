@@ -13,7 +13,7 @@ int main() {
 
   rx::sbus sbus(172, 1811);
 
-  auto last_time = board.micros();
+  auto last_time = board.micros() - LOOP_TIME; // make sure first dt is > 0
   while (true) {
     const auto start = board.micros();
     const float dt = float(start - last_time) * 0.001f;

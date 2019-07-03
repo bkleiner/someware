@@ -43,10 +43,11 @@ namespace control
           rate_pid.reset();
           armed = true;
         }
-
+        #ifdef ENABLE_ANGLE_MODE
         if (recv.get(rx::AUX2) > 0.5f)  {
           angle_mode = true;
         }
+        #endif
       } else {
         if (gesture.update(dt, recv, cfg)) {
           config_dirty = true;
@@ -56,9 +57,9 @@ namespace control
 
       input_demands = {
         rc_filter[0].step(recv.get(rx::THR)) * rc_rate.throttle,
-        filter::expo(rc_filter[3].step(recv.get(rx::AIL)) * rc_rate.roll, 0.8),
-        filter::expo(rc_filter[2].step(recv.get(rx::ELE)) * rc_rate.pitch, 0.8),
-        filter::expo(rc_filter[1].step(recv.get(rx::RUD)) * rc_rate.yaw, 0.6)
+        filter::expo(rc_filter[3].step(recv.get(rx::AIL)), 0.8) * rc_rate.roll,
+        filter::expo(rc_filter[2].step(recv.get(rx::ELE)), 0.8) * rc_rate.pitch,
+        filter::expo(rc_filter[1].step(recv.get(rx::RUD)), 0.6) * rc_rate.yaw
       };
 
       vector rates = {0, 0, 0};
@@ -102,7 +103,8 @@ namespace control
     }
 
     bool is_airborn() {
-      return armed && output_demands.throttle > -0.3f;
+      // this should be smarter.
+      return armed && output_demands.throttle > -0.6f;
     }
 
     void calibrate_gyro() {

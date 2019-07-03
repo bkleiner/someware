@@ -7,6 +7,8 @@
 #define LOOP_FREQ_HZ 2000
 #define LOOP_TIME (1000000 / LOOP_FREQ_HZ)
 
+// #define ENABLE_ANGLE_MODE
+
 namespace control {
   struct demands {
     float throttle; // T
@@ -28,17 +30,19 @@ namespace control {
   static const constexpr float rate_limit_deg = 360.f;
   static const constexpr float angle_limit_deg = 180.0f;
 
-  // rate pind integral limit
-  static const constexpr vector integral_limit = { 1.7 , 1.7 , 0.5 };
+  // rate pid integral limit
+  static const constexpr vector pid_output_limit = { 1.7, 1.7, 0.5 };
+  static const constexpr vector pid_integral_limit = { 1.7, 1.7, 0.5 };
+  static const constexpr vector pid_axis_weights = { 0.93, 0.93, 0.9 };
 
   // imu accel limit
   static const constexpr float accel_limits_min = 0.7f;
   static const constexpr float accel_limits_max = 1.3f;
   
   //                               ROLL   PITCH    YAW
-  static const constexpr vector default_pid_kp = {  0.215,   0.215,   0.15 };
-  static const constexpr vector default_pid_ki = {   1.23,    1.23,   1.04 };	
-  static const constexpr vector default_pid_kd = {  0.795,   0.795,   0.6  };
+  static const constexpr vector default_pid_kp = {   0.29,    0.29,   0.3 };
+  static const constexpr vector default_pid_ki = {    1.3,     1.3,   1.14 };	
+  static const constexpr vector default_pid_kd = {   0.66,    0.66,   0.65 };
 
   static const constexpr demands rc_rate = {
     1.0f, // T

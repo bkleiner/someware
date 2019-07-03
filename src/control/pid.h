@@ -34,7 +34,8 @@ namespace control::pid {
       const float one_over_dt = 1.0f / dt;
 
       // P Term 
-      pterm[axis] = error[axis] * cfg->pid_kp[axis];
+      pterm[axis] = pid_axis_weights[axis] * error[axis] * cfg->pid_kp[axis]
+        - (1.0f - pid_axis_weights[axis]) * cfg->pid_kp[axis] * actual[axis];
 
       // I term
       if (!is_airborn) {
@@ -45,10 +46,10 @@ namespace control::pid {
       }
 
       iterm[axis] = 
-        iterm[axis] + 1/6 * 
-        (lasterror2[axis] + 4 * lasterror[axis] + error[axis])
+        iterm[axis] + 1.0f/6.0f * 
+        (lasterror2[axis] + 4.0f * lasterror[axis] + error[axis])
         * cfg->pid_ki[axis] * dts;
-      iterm[axis] = filter::constrain_min_max(iterm[axis], -integral_limit[axis], integral_limit[axis]);
+      iterm[axis] = filter::constrain_min_max(iterm[axis], -pid_integral_limit[axis], pid_integral_limit[axis]);
 
       // D term
       // skip yaw D term if not set
@@ -64,7 +65,7 @@ namespace control::pid {
       lasterror2[axis] = lasterror[axis];
       lasterror[axis] = error[axis];
 
-      return pterm[axis] + iterm[axis] + dterm[axis];
+      return filter::constrain_min_max(pterm[axis] + iterm[axis] + dterm[axis], -pid_output_limit[axis], pid_output_limit[axis]);
     };
 
     void reset() {
