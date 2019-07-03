@@ -11,12 +11,13 @@ int main() {
   control::console cli(&board);
   control::control ctrl(&board);
 
-  rx::sbus sbus(172, 1811);
+  rx::sbus sbus;
 
-  auto last_time = board.micros() - LOOP_TIME; // make sure first dt is > 0
+  uint32_t last_time = board.micros() - LOOP_TIME; // make sure first dt is > 0
   while (true) {
-    const auto start = board.micros();
-    const float dt = float(start - last_time) * 0.001f;
+    const uint32_t start = board.micros();
+    const uint32_t delta = start - last_time;
+    const float dt = float(delta) * 0.001f;
     last_time = start;
 
     {
@@ -28,8 +29,8 @@ int main() {
       }
     }
     {
-      const auto now = board.micros();
-      const auto delta = (now - start);
+      const uint32_t now = board.micros();
+      const uint32_t delta = (now - start);
 
       if (delta > 0 && delta < LOOP_TIME)
         board.delay_us(LOOP_TIME - delta);

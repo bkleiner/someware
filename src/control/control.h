@@ -26,15 +26,17 @@ namespace control
 
     void update(float dt, rx::rx& recv) {
       vbat = brd->vbat_adc().read();
-      if (!brd->usb_serial_active() && vbat < battery_safety_min) {
-        brd->power_off();
-        return;
-      }
+      
+      // shut the board off after 15 second and no usb when battery is too low
+      // if (brd->millis() > 15000 && !brd->usb_serial_active() && vbat < vbat_safety_min) {
+      //   brd->power_off();
+      //   return;
+      // }
 
       imu.update(dt);
 
       if (recv.get(rx::AUX1) > 0.5f) {
-        if (!armed && recv.get(rx::THR) < -0.8f) {
+        if (!armed && can_arm(recv)) {
           brd->accel().calibrate_accel();
           if (config_dirty) {
             cfg.save(brd->flash());
@@ -43,11 +45,11 @@ namespace control
           rate_pid.reset();
           armed = true;
         }
+
         #ifdef ENABLE_ANGLE_MODE
-        if (recv.get(rx::AUX2) > 0.5f)  {
-          angle_mode = true;
-        }
+        angle_mode = recv.get(rx::AUX2) > 0.5f;
         #endif
+
       } else {
         if (gesture.update(dt, recv, cfg)) {
           config_dirty = true;
@@ -102,6 +104,11 @@ namespace control
       }
     }
 
+    bool can_arm(rx::rx& recv) {
+      return recv.get(rx::THR) < -0.8f
+        && vbat > vbat_arm_min;
+    }
+
     bool is_airborn() {
       // this should be smarter.
       return armed && output_demands.throttle > -0.6f;
@@ -136,10 +143,10 @@ namespace control
     bool config_dirty = false;
 
     filter::biquad_lowpass rc_filter[4] = {
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { rc_input_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { rc_input_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { rc_input_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { rc_input_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
     };
   };
 }

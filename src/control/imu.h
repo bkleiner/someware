@@ -80,21 +80,21 @@ namespace control
     filter::kalman kalman_gyro_filter2;
 
     filter::biquad_lowpass biquad_gyro_filter[3] = {
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { gyro_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { gyro_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { gyro_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
     };
 
     filter::biquad_lowpass accel_filter[3] = {
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { accel_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { accel_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { accel_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
     };
 
     filter::biquad_lowpass angle_filter[3] = {
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { angle_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { angle_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { angle_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
     };
   };
 }

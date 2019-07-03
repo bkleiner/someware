@@ -43,9 +43,8 @@ public:
     DONE
   };
 
-  sbus(uint32_t low, uint32_t high)
-    : rx(low, high)
-    , frame(SBUS_FRAME_SIZE)
+  sbus()
+    : frame(SBUS_FRAME_SIZE)
   {
     frame.fill(0);
   }

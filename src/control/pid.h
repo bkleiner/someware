@@ -49,14 +49,14 @@ namespace control::pid {
         iterm[axis] + 1.0f/6.0f * 
         (lasterror2[axis] + 4.0f * lasterror[axis] + error[axis])
         * cfg->pid_ki[axis] * dts;
-      iterm[axis] = filter::constrain_min_max(iterm[axis], -pid_integral_limit[axis], pid_integral_limit[axis]);
+      iterm[axis] = filter::constrain_min_max(iterm[axis], pid_integral_limit[axis]);
 
       // D term
       // skip yaw D term if not set
       if (cfg->pid_kd[axis] > 0) {
         dterm[axis] = -(actual[axis] - lastrate[axis]) * one_over_dt * cfg->pid_kd[axis];
-        dterm[axis] = filter::lpf2(dterm[axis], axis);
-        // dterm[axis] = gyro_filter[axis].step(dterm[axis]);
+        // dterm[axis] = filter::lpf2(dterm[axis], axis);
+        dterm[axis] = gyro_filter[axis].step(dterm[axis]);
         lastrate[axis] = actual[axis];
       } else {
         dterm[axis] = 0;
@@ -65,7 +65,7 @@ namespace control::pid {
       lasterror2[axis] = lasterror[axis];
       lasterror[axis] = error[axis];
 
-      return filter::constrain_min_max(pterm[axis] + iterm[axis] + dterm[axis], -pid_output_limit[axis], pid_output_limit[axis]);
+      return filter::constrain_min_max(pterm[axis] + iterm[axis] + dterm[axis], pid_output_limit[axis]);
     };
 
     void reset() {
@@ -87,9 +87,9 @@ namespace control::pid {
     const config* cfg = nullptr;
 
     filter::biquad_lowpass gyro_filter[3] = {
-      { 180.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
-      { 180.0f, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { dterm_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { dterm_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
+      { dterm_filter_hz, LOOP_FREQ_HZ, filter::biquad_lowpass::butterworth },
     };
 
     vector lasterror;
@@ -114,23 +114,18 @@ namespace control::pid {
     float calc_axis(float dt, uint8_t axis, const vector& error, const vector& actual) {
       const float one_over_dt = 1.0f / dt;
       
-      pterm[axis] = error[axis] * pid_kp;
-      dterm[axis] = (error[axis] - lasterror[axis]) * pid_kd * one_over_dt;
+      pterm[axis] = error[axis] * angle_pid_kp;
+      dterm[axis] = (error[axis] - lasterror[axis]) * angle_pid_kd * one_over_dt;
 
       lasterror[axis] = error[axis];
       
-      return pterm[axis] + dterm[axis];
+      return filter::constrain_min_max(pterm[axis] + dterm[axis], angle_output_limit);
     }
 
     vector pterm;
     vector dterm;
 
   private:
-    const float pid_kp = 7.0;
-    const float pid_kd = 0.0;
-
-    const float output_limit = pid_kp;
-
     vector lasterror;
   };
 }

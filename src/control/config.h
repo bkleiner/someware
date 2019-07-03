@@ -7,7 +7,7 @@
 #define LOOP_FREQ_HZ 2000
 #define LOOP_TIME (1000000 / LOOP_FREQ_HZ)
 
-// #define ENABLE_ANGLE_MODE
+#define ENABLE_ANGLE_MODE
 
 namespace control {
   struct demands {
@@ -24,7 +24,8 @@ namespace control {
     int8_t yaw;	     // R
   };
 
-  static const constexpr uint16_t battery_safety_min = 3.2;
+  static const constexpr uint16_t vbat_safety_min = 320;
+  static const constexpr uint16_t vbat_arm_min = 370;
 
   // rate/angle mode limits
   static const constexpr float rate_limit_deg = 360.f;
@@ -40,9 +41,13 @@ namespace control {
   static const constexpr float accel_limits_max = 1.3f;
   
   //                               ROLL   PITCH    YAW
-  static const constexpr vector default_pid_kp = {   0.29,    0.29,   0.3 };
-  static const constexpr vector default_pid_ki = {    1.3,     1.3,   1.14 };	
-  static const constexpr vector default_pid_kd = {   0.66,    0.66,   0.65 };
+  static const constexpr vector default_pid_kp = {    0.3,     0.3,   0.6 };
+  static const constexpr vector default_pid_ki = {   1.33,    1.33,   1.40 };	
+  static const constexpr vector default_pid_kd = {   0.64,    0.64,   0.60 };
+
+  static const constexpr float angle_pid_kp = 10.0;
+  static const constexpr float angle_pid_kd =  3.0;
+  static const constexpr float angle_output_limit = angle_pid_kp;
 
   static const constexpr demands rc_rate = {
     1.0f, // T
@@ -50,6 +55,14 @@ namespace control {
     0.5f, // E
     0.5f  // R
   };
+  static const constexpr float rc_midpoint = 993;
+  static const constexpr float rc_ranges[4][2] = {
+    {172, 1815},
+    {182, 1815},
+    {184, 1815},
+    {172, 1815}
+  };
+
 
   // mixer motor count and mapping
   static const constexpr uint8_t motor_count = 4;
@@ -60,6 +73,13 @@ namespace control {
     { +1, -1, +1, -1 }, // 3 rear right
     { +1, -1, -1, +1 }  // 4 front  right
   };
+
+  // filters
+  static const constexpr float rc_input_filter_hz = 100;
+  static const constexpr float gyro_filter_hz     = 100;
+  static const constexpr float accel_filter_hz    = 100;
+  static const constexpr float angle_filter_hz    = 100;
+  static const constexpr float dterm_filter_hz    = 100;
 
   struct config {
     vector gyro_bias;
