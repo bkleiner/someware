@@ -113,9 +113,18 @@ namespace control::pid {
 
     float calc_axis(float dt, uint8_t axis, const vector& error, const vector& actual) {
       const float one_over_dt = 1.0f / dt;
+      const float abs_error = std::fabs(error[axis]);
       
-      pterm[axis] = error[axis] * angle_pid_kp;
-      dterm[axis] = (error[axis] - lasterror[axis]) * angle_pid_kd * one_over_dt;
+      pterm[axis] = filter::mix(
+        abs_error,
+        error[axis] * angle_pid_kp,
+        error[axis] * angle_pid_kp_2
+      );
+      dterm[axis] = filter::mix(
+        abs_error,
+        (error[axis] - lasterror[axis]) * angle_pid_kd * one_over_dt,
+        (error[axis] - lasterror[axis]) * angle_pid_kd_2 * one_over_dt
+      );
 
       lasterror[axis] = error[axis];
       

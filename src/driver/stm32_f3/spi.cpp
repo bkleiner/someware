@@ -51,7 +51,7 @@ namespace stm32_f3 {
   }
 
   uint8_t spi::transfer(uint8_t v) {
-    for (uint16_t spiTimeout = 0x1000; SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET; ) {
+    for (uint16_t spiTimeout = 1000; SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET; ) {
       if ((spiTimeout--) == 0)
         return 0xff;
     }
@@ -62,7 +62,7 @@ namespace stm32_f3 {
     SPI_I2S_SendData(SPI1, v);
 #endif
 
-    for (uint16_t spiTimeout = 0x1000; SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET; ) {
+    for (uint16_t spiTimeout = 1000; SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET; ) {
       if ((spiTimeout--) == 0)
         return 0xff;
     }

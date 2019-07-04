@@ -32,7 +32,7 @@ int main() {
       const uint32_t now = board.micros();
       const uint32_t delta = (now - start);
 
-      if (delta > 0 && delta < LOOP_TIME)
+      if (delta > 10 && delta < LOOP_TIME)
         board.delay_us(LOOP_TIME - delta);
     }
   }

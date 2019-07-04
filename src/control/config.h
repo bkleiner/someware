@@ -4,7 +4,7 @@
 
 #include "util/util.h"
 
-#define LOOP_FREQ_HZ 2000
+#define LOOP_FREQ_HZ 4000
 #define LOOP_TIME (1000000 / LOOP_FREQ_HZ)
 
 #define ENABLE_ANGLE_MODE
@@ -45,9 +45,14 @@ namespace control {
   static const constexpr vector default_pid_ki = {   1.33,    1.33,   1.40 };	
   static const constexpr vector default_pid_kd = {   0.64,    0.64,   0.60 };
 
+  // angle pids for smaller errors
   static const constexpr float angle_pid_kp = 10.0;
   static const constexpr float angle_pid_kd =  3.0;
-  static const constexpr float angle_output_limit = angle_pid_kp;
+  // angle pids for larger errors
+  static const constexpr float angle_pid_kp_2 = 5.0;
+  static const constexpr float angle_pid_kd_2 = 0.0;
+  // angle pid output limit
+  static const constexpr float angle_output_limit = angle_pid_kp + angle_pid_kp_2;
 
   static const constexpr demands rc_rate = {
     1.0f, // T
@@ -75,6 +80,8 @@ namespace control {
   };
 
   // filters
+  // be carefull with these, the higher the values are
+  // the more noise reaches the motors
   static const constexpr float rc_input_filter_hz = 100;
   static const constexpr float gyro_filter_hz     = 100;
   static const constexpr float accel_filter_hz    = 100;

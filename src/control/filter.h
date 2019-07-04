@@ -135,6 +135,10 @@ namespace control::filter {
     return constrain_min_max(val * val * val * exp + val * (1 - exp), -1, 1);
   }
 
+  static float mix(float s, float v1, float v2) {
+    return (1.0f - s) * v1 + s * v2;
+  }
+
   static constexpr float filter_calc(float sampleperiod, float filtertime) {
     return (1.0f - (6.0f * sampleperiod) / (3.0f * sampleperiod + filtertime));
   }

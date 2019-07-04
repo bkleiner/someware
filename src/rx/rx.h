@@ -23,7 +23,7 @@ namespace rx {
     void update() {
       if (!read_channels(channel_data)) {
         // failsafe?
-        reset();
+        // reset();
       }
     }
 
