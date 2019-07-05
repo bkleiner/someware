@@ -9,21 +9,25 @@
 #include "driver/stm32_f3/serial_uart.h"
 
 #include "driver/accel/mpu_6000.h"
+#include "driver/osd/max_7456.h"
 
 namespace stm32_f3 {
   class betaflight_f3 : public board {
   public:
     betaflight_f3()
       : mpu(&spi1, &mpu_cs_pin)
+      , max(&spi1, &max_cs_pin)
     {}
 
     using USB_DM_PORT = gpio::port<gpio::A, 11>;
     using USB_DP_PORT = gpio::port<gpio::A, 12>;
 
-    using SPI1_SCK_PORT  = gpio::port<gpio::B, 3>;
-    using SPI1_MISO_PORT = gpio::port<gpio::B, 4>;
-    using SPI1_MOSI_PORT = gpio::port<gpio::B, 5>;
-    spi spi1;
+    spi::spi<
+      spi::DEVICE1,
+      gpio::port<gpio::B, 3>,
+      gpio::port<gpio::B, 4>,
+      gpio::port<gpio::B, 5>
+    > spi1;
 
     gpio::pin<
       gpio::port<gpio::A, 15>,
@@ -35,6 +39,13 @@ namespace stm32_f3 {
     accel::accel& accel() override {
       return mpu;
     }
+
+    gpio::pin<
+      gpio::port<gpio::A, 1>,
+      gpio::mode_output_pp
+    > max_cs_pin;
+
+    osd::max_7456 max;
     
     gpio::pin<
       gpio::port<gpio::C, 15>,

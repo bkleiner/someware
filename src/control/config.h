@@ -42,7 +42,7 @@ namespace control {
   
   //                               ROLL   PITCH    YAW
   static const constexpr vector default_pid_kp = {    0.3,     0.3,   0.6 };
-  static const constexpr vector default_pid_ki = {   1.33,    1.33,   1.40 };	
+  static const constexpr vector default_pid_ki = {   1.40,    1.40,   1.40 };	
   static const constexpr vector default_pid_kd = {   0.64,    0.64,   0.60 };
 
   // angle pids for smaller errors

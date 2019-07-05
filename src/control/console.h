@@ -24,10 +24,6 @@ namespace control {
       if (dump_ctrl) {
         util::trigger_every<250>(time, [&] () {
           usb.printf(
-            "THR: %5.2f, AIL: %5.2f, ELE: %5.2f, RUD: %5.2f, AUX1: %5.2f, AUX2: %5.2f\r\n",
-            sbus.get(rx::THR), sbus.get(rx::AIL), sbus.get(rx::ELE), sbus.get(rx::RUD), sbus.get(rx::AUX1), sbus.get(rx::AUX2)
-          );
-          usb.printf(
             "CTRL DT: %5.2f, FREQ: %5.2fkHz, ARMED: %d, AIRBORN: %d, VBAT: %u\r\n",
             dt,
             (1000.f / dt) / 1000.f,
@@ -36,11 +32,13 @@ namespace control {
             ctrl.vbat
           );
           usb.printf(
-            "RX THR: %d, ROLL: %d, PITCH: %d, YAW: %d\r\n",
-            sbus.get_raw(rx::THR),
-            sbus.get_raw(rx::AIL),
-            sbus.get_raw(rx::ELE),
-            sbus.get_raw(rx::RUD)
+            "RX THR: %5.2f, AIL: %5.2f, ELE: %5.2f, RUD: %5.2f, AUX1: %5.2f, AUX2: %5.2f\r\n",
+            sbus.get(rx::THR),
+            sbus.get(rx::AIL),
+            sbus.get(rx::ELE),
+            sbus.get(rx::RUD),
+            sbus.get(rx::AUX1),
+            sbus.get(rx::AUX2)
           );
           usb.printf(
             "INPUT THR: %5.2f, ROLL: %5.2f, PITCH: %5.2f, YAW: %5.2f\r\n",

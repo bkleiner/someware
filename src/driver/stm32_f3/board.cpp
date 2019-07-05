@@ -44,8 +44,8 @@ uint32_t board::micros() {
 }
 
 void board::delay_us(uint64_t us) {
-  volatile uint32_t start = DWT->CYCCNT;
   volatile uint32_t delay = us * (SystemCoreClock / 1000000L);
+  volatile uint32_t start = DWT->CYCCNT;
   while (DWT->CYCCNT - start < delay) {
     asm volatile ("nop");
   }
